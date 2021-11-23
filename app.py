@@ -26,6 +26,23 @@ def index():
     return "<p>Hello !</p>"
 
 
+@app.route('/annotations/<gene>')
+def annotations(gene):
+    conn = dbconn('ProteinStructure2')
+    cursor = conn.cursor()
+    cursor.execute('select biosequence_desc,gene_symbol,full_gene_name,aliases,functional_description from biosequence_annotation ba join biosequence bs on ba.biosequence_id=bs.biosequence_id where full_gene_name=%s', gene)
+    result = []
+    for bs_desc,gene_symbol,full_gene_name,aliases,functional_description in cursor.fetchall():
+        desc_comps = bs_desc.split('" ')
+        for comp in desc_comps:
+            if comp.startswith('location'):
+                coords = comp.split('=')[1].strip('"')
+        result.append({'location': coords, 'gene_symbol': gene_symbol, 'full_gene_name': full_gene_name,
+                       'aliases': aliases, 'functional_description': functional_description})
+
+    return jsonify(annotations=result, num_annotations=len(result))
+
+
 @app.route('/microarray_data/<gene>')
 def microarray_data(gene):
     conn = dbconn('microarray3')
