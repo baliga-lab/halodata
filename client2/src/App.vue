@@ -29,7 +29,7 @@
     </v-app-bar>
 
     <v-main>
-      <SearchForm/>
+      <SearchForm />
     </v-main>
   </v-app>
 </template>
@@ -38,14 +38,13 @@
 import SearchForm from './components/SearchForm';
 
 export default {
-  name: 'App',
+    name: 'App',
 
-  components: {
-    SearchForm,
-  },
+    components: {
+        SearchForm
+    },
 
-  data: () => ({
-    //
-  }),
+    data: () => ({
+    })
 };
 </script>
