@@ -103,9 +103,9 @@
 
 <script>
 import igv from 'igv';
-//var BASE_URL = 'http://localhost:5000';
-var BASE_URL = '/api';
-var STATIC_URL = '/';
+var BASE_URL = process.env.VUE_APP_API_BASE_URL;
+var STATIC_URL = process.env.VUE_APP_STATIC_URL;
+
 export default {
     name: 'SearchForm',
 
@@ -181,7 +181,10 @@ export default {
                     self.igv = browser;
             });
         }
-    }
+    },
+    mounted() {
+    },
+
   }
 
 /* COG link https://www.ncbi.nlm.nih.gov/research/cog/cog/COG1136/ */
