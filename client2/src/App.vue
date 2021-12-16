@@ -29,20 +29,16 @@
     </v-app-bar>
 
     <v-main>
-      <SearchForm />
+      <router-view></router-view>
     </v-main>
   </v-app>
 </template>
 
 <script>
-import SearchForm from './components/SearchForm';
 
 export default {
     name: 'App',
 
-    components: {
-        SearchForm
-    },
 
     data: () => ({
     })
