@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import SearchForm from './components/SearchForm'
+import GeneView from './components/GeneView'
 
 Vue.use(Router)
 
@@ -12,6 +13,11 @@ export default new Router({
             path: '/',
             name: 'home',
             component: SearchForm
+        },
+        {
+            path: '/viewgene/:gene',
+            name: 'viewgene',
+            component: GeneView
         }
     ]
 });
