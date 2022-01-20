@@ -42,24 +42,35 @@
         </v-list-item-content>
       </v-list-item>
       <v-spacer style="height: 12pt"></v-spacer>
-      <v-row>
-        <h4>DNA</h4>
-        <p style="font-family: Courier; font-size: 8pt; text-align: left">
-          {{proteinStructureData.dna}}
-        </p>
-      </v-row>
-      <v-row>
-        <h4>Peptide</h4>
-        <p style="font-family: Courier; font-size: 8pt; text-align: left">
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title>Transcript Structure</v-list-item-title>
+          <v-list-item-subtitle><a :href="transcriptPDFLink" target="_blank">PDF</a></v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+      <v-spacer style="height: 12pt"></v-spacer>
+
+      <v-expansion-panels>
+        <v-expansion-panel>
+          <v-expansion-panel-header>DNA</v-expansion-panel-header>
+          <v-expansion-panel-content style="font-family: Courier; font-size: 8pt; text-align: left">
+            {{proteinStructureData.dna}}
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+        <v-expansion-panel>
+          <v-expansion-panel-header>Peptide</v-expansion-panel-header>
+          <v-expansion-panel-content style="font-family: Courier; font-size: 8pt; text-align: left">
           {{proteinStructureData.peptide}}
-        </p>
-      </v-row>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
     </div>
-    <v-spacer style="height: 12pt"></v-spacer>
+
+    <v-spacer style="height: 20pt"></v-spacer>
 
     <!-- Microarray data -->
     <v-row v-if="microarrayData.length" class="text-center">
-      <h4>Microarray Data</h4>
+      <h4>Microarray Data</h4> (<a :href="downloadMicroarrayURL">Download</a>)
     </v-row>
     <v-row v-if="microarrayData.length" class="text-center">
       <v-col class="mb-4">
@@ -89,7 +100,10 @@ export default {
     name: 'GeneView',
 
     data: () => ({
+        transcriptPDFLink: '',
         microarrayData: [],
+        //downloadMicroarrayURL: BASE_URL + '/download_microarray_data' + this.$route.params.gene,
+        downloadMicroarrayURL: BASE_URL + '/download_microarray_data',
         proteinStructureData: null,
         maHeaders: [
           {text: 'Condition', value: 'condition'},
@@ -120,6 +134,57 @@ export default {
                 },
                 tracks: [
                     {
+                        url: STATIC_URL + "ribosomal_RNA_TP2-fwd.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "ribo",
+                        name: "Ribo-Seq TP2 (+)",
+                        color: "darkgrey"
+                    },
+                    {
+                        url: STATIC_URL + "total-RNA-TP2-rev.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "tot",
+                        name: "RNA-Seq TP2 (+)",
+                        color: "darkgrey"
+                    },
+                    {
+                        url: STATIC_URL + "TPS_gff_fwd.gff3",
+                        type: "annotation",
+                        format: "gff3",
+                        name: "TPS (+)",
+                        height: 30,
+                        color: "#59A14F",
+                        displayMode: "SQUISHED"
+                    },
+                    {
+                        url: STATIC_URL + "br1biorep1-interaction-regions-entire-genome-fwd.gff3",
+                        type: "annotation",
+                        format: "gff3",
+                        name: "SmAP1 interaction (+) Rep 1",
+                        height: 30,
+                        color: "#E15759",
+                        displayMode: "SQUISHED"
+                    },
+                    {
+                        url: STATIC_URL + "br2biorep2-interaction-regions-entire-genome-fwd.gff3",
+                        type: "annotation",
+                        format: "gff3",
+                        name: "SmAP1 interaction (+) Rep 2",
+                        height: 30,
+                        color: "#E15759",
+                        displayMode: "SQUISHED"
+                    },
+                    {
+                        url: STATIC_URL + "Hsalinarum-846asRNAs-deAlmeida2019.gff3",
+                        type: "annotation",
+                        format: "gff3",
+                        name: "Antisense RNAs",
+                        color: "#B07AA1",
+                        displayMode: "EXPANDED"
+                    },
+                    {
                         url: STATIC_URL + "Hsalinarum-gene-annotation-pfeiffer2019-adjusted-names.gff3",
                         type: "annotation",
                         searchable: true,
@@ -128,6 +193,59 @@ export default {
                         color: "#4E79A7",
                         displayMode: "COLLAPSED"
                     },
+                    {
+                        url: STATIC_URL + "Hsalinarum-pfeiffer2019-mobileElements.gff3",
+                        type: "annotation",
+                        searchable: true,
+                        format: "gff3",
+                        name: "IS annotation",
+                        color: "#59A14F",
+                        displayMode: "COLLAPSED"
+                    },
+                    {
+                        url: STATIC_URL + "br1biorep1-interaction-regions-entire-genome-rev.gff3",
+                        type: "annotation",
+                        format: "gff3",
+                        name: "SmAP1 interaction (-) Rep 1",
+                        height: 30,
+                        color: "#E15759",
+                        displayMode: "SQUISHED"
+                    },
+                    {
+                        url: STATIC_URL + "br2biorep2-interaction-regions-entire-genome-rev.gff3",
+                        type: "annotation",
+                        format: "gff3",
+                        name: "SmAP1 interaction (-) Rep 2",
+                        height: 30,
+                        color: "#E15759",
+                        displayMode: "SQUISHED"
+                    },
+                    {
+                        url: STATIC_URL + "TPS_gff_rev.gff3",
+                        type: "annotation",
+                        format: "gff3",
+                        name: "TPS (-)",
+                        height: 30,
+                        color: "#59A14F",
+                        displayMode: "SQUISHED"
+                    },
+                    {
+                        url: STATIC_URL + "ribosomal_RNA_TP2-rev.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "ribo",
+                        name: "Ribo-Seq TP2 (-)",
+                        color: "darkgrey"
+                    },
+                    /*
+                    {
+                        url: STATIC_URL + "total-RNA-TP2-fwd.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "tot",
+                        name: "RNA-Seq TP2 (-)",
+                        color: "darkgrey"
+                    }*/
                 ]
             };
             igv.createBrowser(igvDiv, options)
@@ -140,6 +258,9 @@ export default {
         var gene = this.$route.params.gene;
         var microarrayApi = BASE_URL + '/microarray_data/' + gene;
         var proteinStructureApi = BASE_URL + '/proteinstructure/' + gene;
+        this.transcriptPDFLink = 'http://networks.systemsbiology.net/projects/halo/transcript_structure/' +
+            gene + '.pdf';
+        this.downloadMicroarrayURL = BASE_URL + '/download_microarray_data/' + gene;
         fetch(microarrayApi)
             .then((response) => { return response.json();
                                 }).then((result) => {

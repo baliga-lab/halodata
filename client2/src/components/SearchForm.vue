@@ -19,26 +19,42 @@
     <v-row v-if="noResults" class="text-center">
       <h2>No results found</h2>
     </v-row>
+    <v-row>
+      <v-list-item v-for="(item, index) in results" :key="item.full_gene_name">
+        <v-list-item-content>
+          <v-list-item-title>{{index + 1}}. <router-link :to="{name: 'viewgene', params: {gene: item.full_gene_name}}">{{item.full_gene_name}}</router-link> ({{item.gene_symbol}})</v-list-item-title>
+          <v-list-item-subtitle>{{item.functional_description}}</v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+    </v-row>
 
 
   </v-container>
 </template>
 
 <script>
-//var BASE_URL = process.env.VUE_APP_API_BASE_URL;
-//var STATIC_URL = process.env.VUE_APP_STATIC_URL;
+var BASE_URL = process.env.VUE_APP_API_BASE_URL;
 
 export default {
     name: 'SearchForm',
 
     data: () => ({
         gene: '',
+        results: [],
         noResults: false,
 
     }),
     methods: {
         onSubmit: function() {
-            this.$router.push({name: 'viewgene', params: { gene: this.gene}});
+            //this.$router.push({name: 'viewgene', params: { gene: this.gene}});
+            var searchApi = BASE_URL + '/search/' + this.gene;
+            fetch(searchApi)
+                .then((response) => {
+                    return response.json();
+                }).then((result) => {
+                    this.results = result.results;
+                    this.noResults = this.results.length == 0;
+                });
         }
     }
 

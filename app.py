@@ -6,8 +6,7 @@ import traceback
 #import pymssql
 import pyodbc
 
-
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, Response
 from flask_cors import CORS
 
 
@@ -43,6 +42,7 @@ def annotations(gene):
     result = []
     for bs_desc,gene_symbol,full_gene_name,aliases,functional_description in cursor.fetchall():
         desc_comps = bs_desc.split('" ')
+        print(bs_desc)
         for comp in desc_comps:
             if comp.startswith('location'):
                 coords = comp.split('=')[1].strip('"')
@@ -66,6 +66,19 @@ def microarray_data(gene):
                        'lambda': lambdaval})
 
     return jsonify(expressions=result, num_expressions=len(result))
+
+
+@app.route('/download_microarray_data/<gene>')
+def download_microarray_data(gene):
+    conn = dbconn('microarray3')
+    cursor = conn.cursor()
+    cursor.execute('select cc.condition_name,ge.common_name,ge.canonical_name,log10_ratio,lambda from gene_expression ge join comparison_condition cc on ge.condition_id=cc.condition_id where canonical_name=?', gene)
+    result = "Condition,Log10 Ratio,Lambda\n"
+    for cond_name,common_name,canonical_name,log10,lambdaval in cursor.fetchall():
+        result += "%s,%s,%s\n" % (cond_name, str(log10), str(lambdaval))
+    return Response(result,
+                    mimetype="text/plain",
+                    headers={'Content-Disposition': "attachment;filename=%s_microarray.csv" % gene})
 
 """
 Check if the transcript link exists
@@ -133,6 +146,33 @@ def genes():
         result.append(row[0])
 
     return jsonify(genes=result, num_genes=len(result))
+
+
+@app.route('/search/<search_term>')
+def search(search_term):
+    """We need a more secure way to build the IN clause"""
+    search_terms = search_term.split()
+    print(search_terms)
+    search_terms = ["'%s'" % term for term in search_terms]
+    search_term_list = ('(' + ','.join(search_terms) + ')')
+    conn = dbconn('ProteinStructure2')
+    cursor = conn.cursor()
+    #cursor.execute('select biosequence_desc,gene_symbol,full_gene_name,aliases,functional_description from biosequence_annotation ba join biosequence bs on ba.biosequence_id=bs.biosequence_id where full_gene_name=?', search_term)
+    cursor.execute('select biosequence_desc,gene_symbol,full_gene_name,aliases,functional_description from biosequence_annotation ba join biosequence bs on ba.biosequence_id=bs.biosequence_id where full_gene_name in ' + search_term_list + ' or gene_symbol in ' + search_term_list)
+    result = []
+    gene_added = set()
+    for bs_desc,gene_symbol,full_gene_name,aliases,functional_description in cursor.fetchall():
+        if not full_gene_name in gene_added:
+            gene_added.add(full_gene_name)
+            desc_comps = bs_desc.split('" ')
+            for comp in desc_comps:
+                if comp.startswith('location'):
+                    coords = comp.split('=')[1].strip('"')
+                    result.append({'location': coords, 'gene_symbol': gene_symbol,
+                                   'full_gene_name': full_gene_name,
+                                   'aliases': aliases, 'functional_description': functional_description})
+
+    return jsonify(results=result, num_results=len(result))
 
 
 if __name__ == '__main__':
