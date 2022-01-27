@@ -153,12 +153,30 @@ def search(search_term):
     """We need a more secure way to build the IN clause"""
     search_terms = search_term.split()
     print(search_terms)
-    search_terms = ["'%s'" % term for term in search_terms]
-    search_term_list = ('(' + ','.join(search_terms) + ')')
+    plain_search_terms = [term for term in search_terms if not '*' in term]
+    wildcard_search_terms = [term for term in search_terms if '*' in term]
+    plain_search_terms = ["'%s'" % term for term in plain_search_terms]
+    plain_search_term_list = ('(' + ','.join(plain_search_terms) + ')')
     conn = dbconn('ProteinStructure2')
     cursor = conn.cursor()
     #cursor.execute('select biosequence_desc,gene_symbol,full_gene_name,aliases,functional_description from biosequence_annotation ba join biosequence bs on ba.biosequence_id=bs.biosequence_id where full_gene_name=?', search_term)
-    cursor.execute('select biosequence_desc,gene_symbol,full_gene_name,aliases,functional_description from biosequence_annotation ba join biosequence bs on ba.biosequence_id=bs.biosequence_id where full_gene_name in ' + search_term_list + ' or gene_symbol in ' + search_term_list)
+    query = 'select biosequence_desc,gene_symbol,full_gene_name,aliases,functional_description from biosequence_annotation ba join biosequence bs on ba.biosequence_id=bs.biosequence_id where'
+    print("len plain: %d" % len(plain_search_term_list))
+    first_cond = True
+    if len(plain_search_terms) > 0:
+        query += (' full_gene_name in ' + plain_search_term_list +
+        ' or gene_symbol in ' + plain_search_term_list)
+        first_cond = False
+
+    for term in wildcard_search_terms:
+        term = term.replace('*', '%')
+        if not first_cond:
+            query += ' or'
+        query += " full_gene_name like '%s' or gene_symbol like '%s'" % (term, term)
+        first_cond = False
+    print(query)
+    cursor.execute(query)
+
     result = []
     gene_added = set()
     for bs_desc,gene_symbol,full_gene_name,aliases,functional_description in cursor.fetchall():

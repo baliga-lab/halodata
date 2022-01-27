@@ -44,6 +44,16 @@
       <v-spacer style="height: 12pt"></v-spacer>
       <v-list-item>
         <v-list-item-content>
+          <v-list-item-title>Networks</v-list-item-title>
+          <v-list-item-subtitle>
+            <a :href="egrinLink" target="_blank">EGRIN</a><br>
+            <a :href="egrin2Link" target="_blank">EGRIN2</a>
+          </v-list-item-subtitle>
+        </v-list-item-content>
+      </v-list-item>
+      <v-spacer style="height: 12pt"></v-spacer>
+      <v-list-item>
+        <v-list-item-content>
           <v-list-item-title>Transcript Structure</v-list-item-title>
           <v-list-item-subtitle><a :href="transcriptPDFLink" target="_blank">PDF</a></v-list-item-subtitle>
         </v-list-item-content>
@@ -101,6 +111,8 @@ export default {
 
     data: () => ({
         transcriptPDFLink: '',
+        egrinLink: '',
+        egrin2Link: '',
         microarrayData: [],
         //downloadMicroarrayURL: BASE_URL + '/download_microarray_data' + this.$route.params.gene,
         downloadMicroarrayURL: BASE_URL + '/download_microarray_data',
@@ -260,6 +272,8 @@ export default {
         var proteinStructureApi = BASE_URL + '/proteinstructure/' + gene;
         this.transcriptPDFLink = 'http://networks.systemsbiology.net/projects/halo/transcript_structure/' +
             gene + '.pdf';
+        this.egrinLink = 'http://networks.systemsbiology.net/hal/gene/' + gene;
+        this.egrin2Link = 'http://egrin2.systemsbiology.net/genes/64091/' + gene;
         this.downloadMicroarrayURL = BASE_URL + '/download_microarray_data/' + gene;
         fetch(microarrayApi)
             .then((response) => { return response.json();
