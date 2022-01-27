@@ -8,7 +8,7 @@
     <!-- Proceinstructure data -->
     <div style="text-align: left" v-if="proteinStructureData">
       <v-row>
-        <h3>Annotation</h3>
+        <h3>Annotations</h3>
       </v-row>
       <v-row class="text-center">
         <v-col class="mb-4">
@@ -41,25 +41,64 @@
           <v-list-item-subtitle>{{proteinStructureData.function}}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
+      <v-row>
+        <h3>Gene Regulatory Network</h3>
+      </v-row>
       <v-spacer style="height: 12pt"></v-spacer>
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title>Networks</v-list-item-title>
           <v-list-item-subtitle>
-            <a :href="egrinLink" target="_blank">EGRIN</a><br>
+            <a :href="egrinLink" target="_blank">EGRIN</a>&nbsp;
             <a :href="egrin2Link" target="_blank">EGRIN2</a>
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-spacer style="height: 12pt"></v-spacer>
+      <v-row>
+        <h3>Transcript Structure</h3>
+      </v-row>
       <v-list-item>
         <v-list-item-content>
-          <v-list-item-title>Transcript Structure</v-list-item-title>
           <v-list-item-subtitle><a :href="transcriptPDFLink" target="_blank">PDF</a></v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
       <v-spacer style="height: 12pt"></v-spacer>
 
+    </div>
+
+    <v-spacer style="height: 20pt"></v-spacer>
+
+    <!-- Microarray data -->
+    <v-row v-if="microarrayData.length" class="text-center">
+      <h3>Data</h3> 
+    </v-row>
+    <v-row v-if="microarrayData.length" class="text-center">
+      <v-expansion-panels>
+        <v-expansion-panel>
+          <v-expansion-panel-header>Microarray Data &nbsp; <a :href="downloadMicroarrayURL">Download</a></v-expansion-panel-header>
+          <v-expansion-panel-content>
+            <v-data-table
+              :headers="maHeaders"
+              :items="microarrayData"
+              item-key="condition">
+              <template v-slot:item="{item}">
+                <tr>
+                  <td style="text-align: left">{{item.condition}}</td>
+                  <td >{{item.log10_ratio}}</td>
+                  <td>{{item.lambda}}</td>
+                </tr>
+              </template>
+            </v-data-table>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+    </v-row>
+    <v-spacer style="height: 20pt"></v-spacer>
+
+    <v-row>
+      <h3>Sequences</h3>
+    </v-row>
+    <v-row v-if="proteinStructureData">
       <v-expansion-panels>
         <v-expansion-panel>
           <v-expansion-panel-header>DNA</v-expansion-panel-header>
@@ -74,30 +113,8 @@
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
-    </div>
-
+    </v-row>
     <v-spacer style="height: 20pt"></v-spacer>
-
-    <!-- Microarray data -->
-    <v-row v-if="microarrayData.length" class="text-center">
-      <h4>Microarray Data</h4> (<a :href="downloadMicroarrayURL">Download</a>)
-    </v-row>
-    <v-row v-if="microarrayData.length" class="text-center">
-      <v-col class="mb-4">
-        <v-data-table
-          :headers="maHeaders"
-          :items="microarrayData"
-          item-key="condition">
-          <template v-slot:item="{item}">
-            <tr>
-            <td style="text-align: left">{{item.condition}}</td>
-            <td >{{item.log10_ratio}}</td>
-            <td>{{item.lambda}}</td>
-            </tr>
-          </template>
-        </v-data-table>
-      </v-col>
-    </v-row>
   </v-container>
 </template>
 
