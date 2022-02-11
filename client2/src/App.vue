@@ -9,9 +9,9 @@
       <span style="font-size: 18pt">HaloData</span>
       </div>
 
-      <v-spacer></v-spacer>
+      <v-btn text></v-btn>
       <v-btn to="/" text>Home</v-btn>
-      <v-btn to="/" text>Heatmap</v-btn>
+      <v-btn to="/heatmap" text>Heatmap</v-btn>
       <v-spacer></v-spacer>
 
       <v-btn

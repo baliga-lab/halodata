@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import SearchForm from './components/SearchForm'
+import HeatMap from './components/HeatMap'
 import GeneView from './components/GeneView'
 
 Vue.use(Router)
@@ -13,6 +14,11 @@ export default new Router({
             path: '/',
             name: 'home',
             component: SearchForm
+        },
+        {
+            path: '/heatmap',
+            name: 'heatmap',
+            component: HeatMap
         },
         {
             path: '/viewgene/:gene',
