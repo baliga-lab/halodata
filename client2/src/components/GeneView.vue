@@ -1,46 +1,50 @@
 <template>
-  <v-container>
+<v-container>
+  <v-spacer style="height: 32pt"></v-spacer>
+  <v-row v-if="proteinStructureData">
+    <span style="font-size: 16pt"><b>{{$route.params.gene}}</b> ({{proteinStructureData.common_name}})</span>&nbsp;
+    <span style="font-size: 16pt; vertical-align: bottom">{{proteinStructureData.function}}</span>
+  </v-row>
+  <v-spacer style="height: 48pt"></v-spacer>
+  <v-row  style="text-align: left" v-if="proteinStructureData">
+    <h3>Annotations</h3>
+  </v-row>
+  <v-row class="text-center" v-if="proteinStructureData">
+    <v-col class="mb-4">
+      <v-simple-table>
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">COG ID</th>
+              <th class="text-left">Genbank ID</th>
+              <th class="text-left">Gene Symbol</th>
+              <th class="text-left">Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left">{{proteinStructureData.COG_ID}}</td>
+              <td class="text-left">{{proteinStructureData.Genbank_ID}}</td>
+              <td class="text-left">{{proteinStructureData.common_name}}</td>
+              <td class="text-left">{{proteinStructureData.location}}</td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </v-col>
+  </v-row>
+
     <!-- IGV Browser -->
-    <v-row>
-      <div id="igv-div"></div>
-    </v-row>
+  <v-row  style="text-align: left" v-if="proteinStructureData">
+    <h3>Genome Browser</h3>
+  </v-row>
+  <v-row>
+    <div id="igv" ref="igv"></div>
+  </v-row>
 
     <!-- Proceinstructure data -->
     <div style="text-align: left" v-if="proteinStructureData">
-      <v-row>
-        <h3>Annotations</h3>
-      </v-row>
-      <v-row class="text-center">
-        <v-col class="mb-4">
-          <v-simple-table>
-            <template v-slot:default>
-              <thead>
-                <tr>
-                  <th class="text-left">COG ID</th>
-                  <th class="text-left">Genbank ID</th>
-                  <th class="text-left">Gene Symbol</th>
-                  <th class="text-left">Location</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="text-left">{{proteinStructureData.COG_ID}}</td>
-                  <td class="text-left">{{proteinStructureData.Genbank_ID}}</td>
-                  <td class="text-left">{{proteinStructureData.common_name}}</td>
-                  <td class="text-left">{{proteinStructureData.location}}</td>
-                </tr>
-              </tbody>
-            </template>
-          </v-simple-table>
-        </v-col>
-      </v-row>
 
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-title>Function</v-list-item-title>
-          <v-list-item-subtitle>{{proteinStructureData.function}}</v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
       <v-row>
         <h3>Gene Regulatory Network</h3>
       </v-row>
@@ -49,7 +53,7 @@
         <v-list-item-content>
           <v-list-item-subtitle>
             <a :href="egrinLink" target="_blank">EGRIN</a>&nbsp;
-            <a :href="egrin2Link" target="_blank">EGRIN2</a>
+            <a :href="egrin2Link" target="_blank">EGRIN2.0</a>
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -149,9 +153,8 @@ export default {
     }),
     methods: {
         loadIGVBrowser: function(igvLoc) {
-            console.log(STATIC_URL);
             igv.removeAllBrowsers();
-            var igvDiv = document.getElementById("igv-div");
+            var igvDiv = this.$refs.igv; //document.getElementById("igv");
             var self = this;
             var options = {
                 locus: igvLoc,
@@ -163,7 +166,7 @@ export default {
                 },
                 tracks: [
                     {
-                        url: STATIC_URL + "ribosomal_RNA_TP2-fwd.bedgraph.gz",
+                        url: STATIC_URL + "ribosomal_RNA_TP2-fwd2.bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
@@ -171,7 +174,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "total-RNA-TP2-rev.bedgraph.gz",
+                        url: STATIC_URL + "total-RNA-TP2-rev2.bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "tot",
@@ -188,7 +191,7 @@ export default {
                         displayMode: "SQUISHED"
                     },
                     {
-                        url: STATIC_URL + "br1biorep1-interaction-regions-entire-genome-fwd.gff3",
+                        url: STATIC_URL + "br1biorep1-interaction-regions-entire-genome-fwd2.gff3",
                         type: "annotation",
                         format: "gff3",
                         name: "SmAP1 interaction (+) Rep 1",
@@ -197,7 +200,7 @@ export default {
                         displayMode: "SQUISHED"
                     },
                     {
-                        url: STATIC_URL + "br2biorep2-interaction-regions-entire-genome-fwd.gff3",
+                        url: STATIC_URL + "br2biorep2-interaction-regions-entire-genome-fwd2.gff3",
                         type: "annotation",
                         format: "gff3",
                         name: "SmAP1 interaction (+) Rep 2",
@@ -232,7 +235,7 @@ export default {
                         displayMode: "COLLAPSED"
                     },
                     {
-                        url: STATIC_URL + "br1biorep1-interaction-regions-entire-genome-rev.gff3",
+                        url: STATIC_URL + "br1biorep1-interaction-regions-entire-genome-rev2.gff3",
                         type: "annotation",
                         format: "gff3",
                         name: "SmAP1 interaction (-) Rep 1",
@@ -241,7 +244,7 @@ export default {
                         displayMode: "SQUISHED"
                     },
                     {
-                        url: STATIC_URL + "br2biorep2-interaction-regions-entire-genome-rev.gff3",
+                        url: STATIC_URL + "br2biorep2-interaction-regions-entire-genome-rev2.gff3",
                         type: "annotation",
                         format: "gff3",
                         name: "SmAP1 interaction (-) Rep 2",
@@ -259,7 +262,7 @@ export default {
                         displayMode: "SQUISHED"
                     },
                     {
-                        url: STATIC_URL + "ribosomal_RNA_TP2-rev.bedgraph.gz",
+                        url: STATIC_URL + "ribosomal_RNA_TP2-rev2.bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
@@ -302,7 +305,11 @@ export default {
                 return response.json();
             }).then((result) => {
                 this.proteinStructureData = result.result;
-                this.loadIGVBrowser(this.proteinStructureData.igv_loc);
+                // WW: loading the browser too early results in the div not
+                // existing sometimes, so we wrap it in a nextTick
+                this.$nextTick(() => {
+                    this.loadIGVBrowser(this.proteinStructureData.igv_loc);
+                });
             });
     },
 

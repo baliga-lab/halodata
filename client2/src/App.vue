@@ -10,6 +10,9 @@
       </div>
 
       <v-spacer></v-spacer>
+      <v-btn to="/" text>Home</v-btn>
+      <v-btn to="/" text>Heatmap</v-btn>
+      <v-spacer></v-spacer>
 
       <v-btn
         href="https://isbscience.org"
