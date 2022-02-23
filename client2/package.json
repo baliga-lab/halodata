@@ -8,7 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "biojs-vis-inchlib": "^1.1.2",
+    "@baliga-lab/inchlib.js": "^1.0.0",
     "core-js": "^3.8.3",
     "igv": "^2.10.4",
     "jquery": "^3.6.0",

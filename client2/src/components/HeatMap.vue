@@ -8,9 +8,9 @@
 </template>
 
 <script>
-  import jquery from 'jquery';
+  import jQuery from 'jquery';
   import Kinetic from 'kinetic';
-import inchlib2 from 'biojs-vis-inchlib';
+import inchlib2 from '@baliga-lab/inchlib.js';
 var STATIC_URL = process.env.VUE_APP_STATIC_URL;
 
 export default {
@@ -20,9 +20,12 @@ export default {
         gene: '',
     }),
     mounted() {
-        window.$ = jquery;
+        window.jQuery = jQuery;
+        window.$ = jQuery;
         window.Kinetic = Kinetic;
-        var inchlib = new inchlib2({ //instantiate InCHlib
+        console.log(inchlib2);
+        console.log(jQuery);
+        window.inchlib = new inchlib2(jQuery, { //instantiate InCHlib
             target: "inchlib", //ID of a target HTML element
             metadata: true, //turn on the metadata
             column_metadata: true, //turn on the column metadata
@@ -31,8 +34,13 @@ export default {
             heatmap_colors: "RdYlBu", //set color scale for clustered data
             metadata_colors: "BuWhRd", //set color scale for metadata
         });
-        inchlib.read_data_from_file(STATIC_URL + "atlas_data2.json");
-        inchlib.draw(); //draw cluster heatmap
+        var heatmap_url = STATIC_URL + "atlas_data2.json"
+        console.log(heatmap_url);
+        // TODO: read async
+        fetch(heatmap_url).then(r => r.json()).then(json => {
+            window.inchlib.read_data(json);
+            window.inchlib.draw(); //draw cluster heatmap
+        });
     }
 
   }

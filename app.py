@@ -3,8 +3,9 @@
 import json
 import os
 import traceback
-#import pymssql
 import pyodbc
+
+import mysql.connector
 
 from flask import Flask, render_template, jsonify, Response
 from flask_cors import CORS
@@ -15,6 +16,13 @@ CORS(app)
 app.config.from_envvar('APP_SETTINGS')
 
 HALO_ID = 4
+
+
+def mysql_conn():
+    return mysql.connector.connect(host=app.config['MYSQL_HOST'],
+                                   user=app.config['MYSQL_USER'],
+                                   password=app.config['MYSQL_PASS'],
+                                   database=app.config['MYSQL_DB'])
 
 def dbconn(dbname):
     driver = 'FreeTDS'
@@ -32,6 +40,33 @@ def dbconn(dbname):
 @app.route('/')
 def index():
     return "<p>Hello !</p>"
+
+
+@app.route('/newinfo_for_old/<gene>')
+def newinfo_for_old(gene):
+    conn = mysql_conn()
+    result = []
+    with conn.cursor() as cur:
+        query = """select
+                     g.name,c.name as cog_id,cc.name as cog_category,cp.name as cog_pathway,
+                     ins.name as ins_name,ins.family as ins_family,ins.subgroup as ins_subgroup
+                   from genes g
+                     join cog c on g.cog_id=c.id
+                     join cog_categories cc on c.cog_category_id=cc.id
+                     left outer join cog_pathways cp on c.cog_pathway_id=cp.id
+                     left outer join insertion_sequences ins on g.is_id=ins.id
+                   where g.old_name=%s"""
+        cur.execute(query, [gene])
+        for gene,cog_id,ccat,cpathway,ins_name,ins_family,ins_subgroup in cur.fetchall():
+            entry = {'gene': gene, 'cog_id': cog_id, 'cog_category': ccat}
+            if cpathway is not None:
+                entry['cog_pathway'] = cpathway
+            if ins_name is not None:
+                entry['ins_name'] = ins_name
+                entry['ins_family'] = ins_family
+                entry['ins_subgroup'] = ins_subgroup
+            result.append(entry)
+    return jsonify(results=result)
 
 
 @app.route('/annotations/<gene>')
