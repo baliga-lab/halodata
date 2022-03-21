@@ -1,7 +1,11 @@
 <template>
 <v-container>
   <v-spacer style="height: 32pt"></v-spacer>
-  <v-row v-if="proteinStructureData">
+  <v-row v-if="newInfo">
+    <span style="font-size: 16pt"><b>{{newInfo.gene}}</b> ({{$route.params.gene}}, {{proteinStructureData.common_name}})</span>&nbsp;
+    <span style="font-size: 16pt; vertical-align: bottom">{{proteinStructureData.function}}</span>
+  </v-row>
+  <v-row v-else>
     <span style="font-size: 16pt"><b>{{$route.params.gene}}</b> ({{proteinStructureData.common_name}})</span>&nbsp;
     <span style="font-size: 16pt; vertical-align: bottom">{{proteinStructureData.function}}</span>
   </v-row>
@@ -23,10 +27,34 @@
           </thead>
           <tbody>
             <tr>
-              <td class="text-left">{{proteinStructureData.COG_ID}}</td>
+              <td class="text-left"><a :href="cogLink" target="_blank">{{proteinStructureData.COG_ID}}</a></td>
               <td class="text-left">{{proteinStructureData.Genbank_ID}}</td>
               <td class="text-left">{{proteinStructureData.common_name}}</td>
               <td class="text-left">{{proteinStructureData.location}}</td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </v-col>
+  </v-row>
+
+  <v-row  style="text-align: left" v-if="newInfo">
+    <h3>COG Information</h3>
+  </v-row>
+  <v-row class="text-center" v-if="newInfo">
+    <v-col class="mb-4">
+      <v-simple-table>
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">COG Category</th>
+              <th class="text-left">Pathway</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left">{{newInfo.cog_category}}</td>
+              <td class="text-left">{{newInfo.cog_pathway}}</td>
             </tr>
           </tbody>
         </template>
@@ -134,10 +162,11 @@ export default {
         transcriptPDFLink: '',
         egrinLink: '',
         egrin2Link: '',
+        cogLink: '',
         microarrayData: [],
-        //downloadMicroarrayURL: BASE_URL + '/download_microarray_data' + this.$route.params.gene,
         downloadMicroarrayURL: BASE_URL + '/download_microarray_data',
         proteinStructureData: null,
+        newInfo: null,
         maHeaders: [
           {text: 'Condition', value: 'condition'},
           {text: 'Log10 Ratio', value: 'log10_ratio'},
@@ -289,12 +318,20 @@ export default {
     mounted() {
         var gene = this.$route.params.gene;
         var microarrayApi = BASE_URL + '/microarray_data/' + gene;
+        var newInfoApi = BASE_URL + '/newinfo_for_old/' + gene;
         var proteinStructureApi = BASE_URL + '/proteinstructure/' + gene;
         this.transcriptPDFLink = 'http://networks.systemsbiology.net/projects/halo/transcript_structure/' +
             gene + '.pdf';
         this.egrinLink = 'http://networks.systemsbiology.net/hal/gene/' + gene;
         this.egrin2Link = 'http://egrin2.systemsbiology.net/genes/64091/' + gene;
         this.downloadMicroarrayURL = BASE_URL + '/download_microarray_data/' + gene;
+        fetch(newInfoApi)
+            .then((response) => { return response.json();
+                                }).then((result) => {
+                                    if (result.results.length > 0) {
+                                        this.newInfo = result.results[0];
+                                    }
+                                });
         fetch(microarrayApi)
             .then((response) => { return response.json();
                                 }).then((result) => {
@@ -310,6 +347,7 @@ export default {
                 this.$nextTick(() => {
                     this.loadIGVBrowser(this.proteinStructureData.igv_loc);
                 });
+                this.cogLink = "https://www.ncbi.nlm.nih.gov/research/cog/cog/" + this.proteinStructureData.COG_ID + "/"
             });
     },
 

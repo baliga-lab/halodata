@@ -183,6 +183,43 @@ def genes():
     return jsonify(genes=result, num_genes=len(result))
 
 
+@app.route('/locus_tag_entries')
+def locus_tag_entries():
+    conn = mysql_conn()
+    cursor = conn.cursor()
+    cursor.execute('select name,product,old_name from genes order by name')
+    result = []
+    for name, product, old_name in cursor.fetchall():
+        result.append({'representative': name, 'product': product, 'locus_tag': old_name})
+
+    return jsonify(entries=result, num_entries=len(result))
+
+
+@app.route('/cog_info_entries')
+def cog_info_entries():
+    conn = mysql_conn()
+    cursor = conn.cursor()
+    cursor.execute('select g.name,c.name,c.cog_name,cc.name,cp.name from genes g join cog c on g.cog_id=c.id join cog_categories cc on c.cog_category_id=cc.id join cog_pathways cp on c.cog_pathway_id=cp.id')
+    result = []
+    for gene, cog_id, cog_name, category_name, pathway_name in cursor.fetchall():
+        result.append({'representative': gene, 'cog_id': cog_id, 'cog_name': cog_name,
+                       'cog_category': category_name, 'cog_pathway': pathway_name})
+
+    return jsonify(entries=result, num_entries=len(result))
+
+
+@app.route('/is_info_entries')
+def is_info_entries():
+    conn = mysql_conn()
+    cursor = conn.cursor()
+    cursor.execute('select g.name,ins.name,ins.family,ins.subgroup from genes g join insertion_sequences ins on g.is_id=ins.id')
+    result = []
+    for gene, ins_name, ins_family, ins_subgroup in cursor.fetchall():
+        result.append({'representative': gene, 'is_name': ins_name, 'is_family': ins_family, 'is_subgroup': ins_subgroup})
+
+    return jsonify(entries=result, num_entries=len(result))
+
+
 @app.route('/search/<search_term>')
 def search(search_term):
     """We need a more secure way to build the IN clause"""
@@ -190,8 +227,22 @@ def search(search_term):
     print(search_terms)
     plain_search_terms = [term for term in search_terms if not '*' in term]
     wildcard_search_terms = [term for term in search_terms if '*' in term]
+    newname_search_terms = [term for term in search_terms if term.startswith('VNG_')]
+    newname_search_terms = ["'%s'" % term for term in newname_search_terms]  # quote them
+    newname_search_term_list = ('(' + ','.join(newname_search_terms) + ')')
+
+    mysqlconn = mysql_conn()
+    if len(newname_search_terms) > 0:
+        with mysqlconn.cursor() as cur:
+            query = 'select old_name from genes where name in ' + newname_search_term_list
+            print(query)
+            cur.execute(query)
+            for row in cur.fetchall():
+                plain_search_terms.append(row[0])
+
     plain_search_terms = ["'%s'" % term for term in plain_search_terms]
     plain_search_term_list = ('(' + ','.join(plain_search_terms) + ')')
+
     conn = dbconn('ProteinStructure2')
     cursor = conn.cursor()
     #cursor.execute('select biosequence_desc,gene_symbol,full_gene_name,aliases,functional_description from biosequence_annotation ba join biosequence bs on ba.biosequence_id=bs.biosequence_id where full_gene_name=?', search_term)
@@ -214,16 +265,26 @@ def search(search_term):
 
     result = []
     gene_added = set()
-    for bs_desc,gene_symbol,full_gene_name,aliases,functional_description in cursor.fetchall():
-        if not full_gene_name in gene_added:
-            gene_added.add(full_gene_name)
-            desc_comps = bs_desc.split('" ')
-            for comp in desc_comps:
-                if comp.startswith('location'):
-                    coords = comp.split('=')[1].strip('"')
-                    result.append({'location': coords, 'gene_symbol': gene_symbol,
-                                   'full_gene_name': full_gene_name,
-                                   'aliases': aliases, 'functional_description': functional_description})
+    with mysqlconn.cursor() as cur:
+        for bs_desc,gene_symbol,full_gene_name,aliases,functional_description in cursor.fetchall():
+            if not full_gene_name in gene_added:
+                gene_added.add(full_gene_name)
+                # retrieve new name
+                cur.execute('select name from genes where old_name=%s', [full_gene_name])
+                row = cur.fetchone()
+                if row is not None:
+                    new_name = row[0]
+                else:
+                    new_name = ''
+                desc_comps = bs_desc.split('" ')
+                for comp in desc_comps:
+                    if comp.startswith('location'):
+                        coords = comp.split('=')[1].strip('"')
+                        result.append({'location': coords,
+                                       'gene_symbol': gene_symbol,
+                                       'new_name': new_name,
+                                       'full_gene_name': full_gene_name,
+                                       'aliases': aliases, 'functional_description': functional_description})
 
     return jsonify(results=result, num_results=len(result))
 

@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import SearchForm from './components/SearchForm'
 import HeatMap from './components/HeatMap'
 import GeneView from './components/GeneView'
+import DataTables from './components/DataTables'
 
 Vue.use(Router)
 
@@ -24,6 +25,11 @@ export default new Router({
             path: '/viewgene/:gene',
             name: 'viewgene',
             component: GeneView
+        },
+        {
+            path: '/datatables',
+            name: 'datatables',
+            component: DataTables
         }
     ]
 });

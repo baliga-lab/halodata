@@ -22,7 +22,8 @@
     <v-row>
       <v-list-item v-for="(item, index) in results" :key="item.full_gene_name">
         <v-list-item-content>
-          <v-list-item-title>{{index + 1}}. <router-link :to="{name: 'viewgene', params: {gene: item.full_gene_name}}">{{item.full_gene_name}}</router-link> ({{item.gene_symbol}})</v-list-item-title>
+          <v-list-item-title>{{index + 1}}. <router-link :to="{name: 'viewgene', params: {gene: item.full_gene_name}}">{{item.new_name}}</router-link>
+            ({{item.full_gene_name}}, {{item.gene_symbol}})</v-list-item-title>
           <v-list-item-subtitle>{{item.functional_description}}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
