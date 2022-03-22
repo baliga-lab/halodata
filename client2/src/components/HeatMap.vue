@@ -2,11 +2,17 @@
 <v-container>
   <h1>Heatmap</h1>
   <v-row class="text-center">
-    <div id="inchlib"></div>
+    <div id="inchlib"><v-progress-circular
+                        color="blue" indeterminate
+                        size="60" width="8"></v-progress-circular></div>
   </v-row>
 </v-container>
 </template>
-
+<style>
+  .v-progress-circular {
+  margin: 1rem;
+  }
+</style>
 <script>
   import jQuery from 'jquery';
   import Kinetic from 'kinetic';
@@ -35,7 +41,6 @@ export default {
             metadata_colors: "BuWhRd", //set color scale for metadata
         });
         var heatmap_url = STATIC_URL + "atlas_data2.json"
-        console.log(heatmap_url);
         // TODO: read async
         fetch(heatmap_url).then(r => r.json()).then(json => {
             window.inchlib.read_data(json);
