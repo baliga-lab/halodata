@@ -47,8 +47,7 @@ export default {
     }),
     methods: {
         onSubmit: function() {
-            //this.$router.push({name: 'viewgene', params: { gene: this.gene}});
-            var searchApi = BASE_URL + '/search/' + this.gene;
+            var searchApi = BASE_URL + '/search2/' + this.gene;
             fetch(searchApi)
                 .then((response) => {
                     return response.json();

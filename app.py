@@ -9,7 +9,7 @@ import mysql.connector
 
 from flask import Flask, render_template, jsonify, Response
 from flask_cors import CORS
-
+import requests
 
 app = Flask(__name__)
 CORS(app)
@@ -219,6 +219,27 @@ def is_info_entries():
 
     return jsonify(entries=result, num_entries=len(result))
 
+
+@app.route('/search2/<search_term>')
+def solr_search(search_term):
+    solr_url = "http://localhost:8983/solr/halodata/query"
+    solr_url += '?q=all:' + search_term
+    print(solr_url)
+    r = requests.get(solr_url)
+    solr_result = r.json()
+    solr_result = solr_result['response']['docs']
+    print(solr_result)
+    result = []
+    for doc in solr_result:
+
+        ## ADD MISSING FIELDS TODO
+        result.append({'location': '',
+                       'gene_symbol': doc['gene_symbol'],
+                       'new_name': doc['id'],
+                       'full_gene_name': doc['locus_tag'],
+                       'aliases': doc['aliases'], 'functional_description': doc['functional_description']})
+
+    return jsonify(results=result, num_results=len(result))
 
 @app.route('/search/<search_term>')
 def search(search_term):
