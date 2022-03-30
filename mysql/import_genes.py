@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import mysql.connector
+from collections import defaultdict
+import traceback as tb
 
 def dbconn():
     return mysql.connector.connect(host="127.0.0.1", port=3306, user='root', database='halodata')
@@ -12,7 +14,7 @@ def read_synonyms():
         for line in infile:
             name, product, locus_tag = line.strip().split('\t')
             locus_tags = locus_tag.split(',')
-            dict_data[name] = { 'product': product, 'locus_tags': locus_tags }
+            dict_data[name] = { 'product': product, 'locus_tags': list(sorted(set(locus_tags))) }
     return dict_data
 
 def read_sequences():
@@ -36,6 +38,7 @@ def read_sequences():
 def read_cog_data():
     cog_map = {}
     gene2cog = {}
+    symbol_map = defaultdict(list)
     with open('alan_data/cog.tsv') as infile:
         infile.readline()
         for line in infile:
@@ -47,7 +50,9 @@ def read_cog_data():
             if pathway == 'Undefined':
                 pathway = None
             cog_map[cog_id] = {'name': cog_name, 'category': cog_cat, 'pathway': pathway}
-    return cog_map, gene2cog
+            if symbol is not None:
+                symbol_map[rep].append(symbol)
+    return cog_map, gene2cog, symbol_map
 
 
 def read_is_info():
@@ -116,8 +121,9 @@ def import_cog_data(conn, cog_map):
 def import_genes(conn):
     synonyms = read_synonyms()
     seqs = read_sequences()
-    cog_map, gene2cog = read_cog_data()
+    cog_map, gene2cog, symbol_map = read_cog_data()
     is_map, gene2is = read_is_info()
+    locus_tag_map = {}
 
     # integrity check
     num_genes = len(seqs)
@@ -141,9 +147,14 @@ def import_genes(conn):
             # isolate the vng name
             product = synonyms[gene]['product']
             locus_tags = synonyms[gene]['locus_tags']
-            for locus_tag in locus_tags:
-                if locus_tag.startswith('VNG') and not locus_tag.startswith('VNG_'):
-                    vng_name = locus_tag
+            try:
+                gene_symbols = set(symbol_map[gene])
+                if len(gene_symbols) > 1:
+                    print('more than one symbol for %s' % gene)
+                    print(gene_symbols)
+                gene_symbol = list(gene_symbols)[0]
+            except:
+                gene_symbol = None
 
             if gene in gene2cog:
                 cog_id = gene2cog[gene]['cog_id']
@@ -156,15 +167,28 @@ def import_genes(conn):
                 is_name = None
 
             if cog_id is not None and is_name is not None:
-                cur.execute('insert into genes (name,old_name,product,cog_id,is_id,sequence) values (%s,%s,%s,%s,%s,%s)',
-                            [gene, vng_name, product, cog_pk, is_id_map[is_name], seq])
+                cur.execute('insert into genes (name,gene_symbol,product,cog_id,is_id,sequence) values (%s,%s,%s,%s,%s,%s)',
+                            [gene, gene_symbol, product, cog_pk, is_id_map[is_name], seq])
             elif cog_id is not None and is_name is None:
-                cur.execute('insert into genes (name,old_name,product,cog_id,sequence) values (%s,%s,%s,%s,%s)',
-                            [gene, vng_name, product, cog_pk, seq])
+                cur.execute('insert into genes (name,gene_symbol,product,cog_id,sequence) values (%s,%s,%s,%s,%s)',
+                            [gene, gene_symbol, product, cog_pk, seq])
 
             elif cog_id is None and is_name is None:
-                cur.execute('insert into genes (name,old_name,product,sequence) values (%s,%s,%s,%s)',
-                            [gene, vng_name, product, seq])
+                cur.execute('insert into genes (name,gene_symbol,product,sequence) values (%s,%s,%s,%s)',
+                            [gene, gene_symbol, product, seq])
+            gene_id = cur.lastrowid
+            for locus_tag in locus_tags:
+                # add all LOCUS TAGS for that gene (TODO)
+                # should not exist
+                if locus_tag in locus_tag_map:
+                    locus_tag_id = locus_tag_map[locus_tag]
+                else:
+                    cur.execute('insert into locus_tags (name) values (%s)', [locus_tag])
+                    locus_tag_id = cur.lastrowid
+                    locus_tag_map[locus_tag] = locus_tag_id
+                cur.execute('insert into gene_locus_tags (gene_id,locus_tag_id) values (%s,%s)',
+                            [gene_id, locus_tag_id])
+
         conn.commit()
 
 if __name__ == '__main__':
@@ -173,5 +197,5 @@ if __name__ == '__main__':
     with conn.cursor() as cur:
         cur.execute('select count(*) from genes')
         num_genes = cur.fetchone()[0]
-        print("Hello: ", num_genes)
+        print("# genes imported: ", num_genes)
     conn.close()

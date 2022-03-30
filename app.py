@@ -47,18 +47,32 @@ def newinfo_for_old(gene):
     conn = mysql_conn()
     result = []
     with conn.cursor() as cur:
+        q = """select distinct g.id
+               from genes g
+                 join gene_locus_tags glt on g.id=glt.gene_id
+                 join locus_tags lt on lt.id=glt.locus_tag_id
+               where lt.name=%s"""
+        cur.execute(q, [gene])
+        gene_id = None
+        for row in cur.fetchall():
+            gene_id = row[0]
+            break
+        if gene_id is not None:
+            print("Found Gene ID !!!!: ", gene_id)
+
         query = """select
-                     g.name,c.name as cog_id,cc.name as cog_category,cp.name as cog_pathway,
+                     g.name,g.gene_symbol,c.name as cog_id,cc.name as cog_category,cp.name as cog_pathway,
                      ins.name as ins_name,ins.family as ins_family,ins.subgroup as ins_subgroup
                    from genes g
-                     join cog c on g.cog_id=c.id
-                     join cog_categories cc on c.cog_category_id=cc.id
+                     left outer join cog c on g.cog_id=c.id
+                     left outer join cog_categories cc on c.cog_category_id=cc.id
                      left outer join cog_pathways cp on c.cog_pathway_id=cp.id
                      left outer join insertion_sequences ins on g.is_id=ins.id
-                   where g.old_name=%s"""
-        cur.execute(query, [gene])
-        for gene,cog_id,ccat,cpathway,ins_name,ins_family,ins_subgroup in cur.fetchall():
-            entry = {'gene': gene, 'cog_id': cog_id, 'cog_category': ccat}
+                   where g.id=%s"""
+        cur.execute(query, [gene_id])
+        for gene,gene_symbol,cog_id,ccat,cpathway,ins_name,ins_family,ins_subgroup in cur.fetchall():
+            entry = {'gene': gene, 'gene_symbol': gene_symbol, 'cog_id': cog_id, 'cog_category': ccat}
+            print(entry)
             if cpathway is not None:
                 entry['cog_pathway'] = cpathway
             if ins_name is not None:
@@ -183,14 +197,26 @@ def genes():
     return jsonify(genes=result, num_genes=len(result))
 
 
+def _old_name_from_locus_tags(locus_tags):
+    locus_tag_list = locus_tags.split(',')
+    for lt in locus_tag_list:
+        if lt.startswith('VNG') and not lt.startswith('VNG_'):
+            return lt
+    return ''
+
+
 @app.route('/locus_tag_entries')
 def locus_tag_entries():
     conn = mysql_conn()
     cursor = conn.cursor()
-    cursor.execute('select name,product,old_name from genes order by name')
+    #cursor.execute('select name,product,old_name from genes order by name')
+    cursor.execute('select g.name,g.product,group_concat(lt.name) from genes g join gene_locus_tags glt on g.id=glt.gene_id join locus_tags lt on glt.locus_tag_id=lt.id group by g.name order by g.name')
+
     result = []
-    for name, product, old_name in cursor.fetchall():
-        result.append({'representative': name, 'product': product, 'locus_tag': old_name})
+    for name, product, locus_tags in cursor.fetchall():
+        old_name = _old_name_from_locus_tags(locus_tags)
+        result.append({'representative': name, 'old_name': old_name, 'product': product,
+                       'locus_tag': locus_tags})
 
     return jsonify(entries=result, num_entries=len(result))
 
@@ -199,11 +225,12 @@ def locus_tag_entries():
 def cog_info_entries():
     conn = mysql_conn()
     cursor = conn.cursor()
-    cursor.execute('select g.name,c.name,c.cog_name,cc.name,cp.name from genes g join cog c on g.cog_id=c.id join cog_categories cc on c.cog_category_id=cc.id join cog_pathways cp on c.cog_pathway_id=cp.id')
+    cursor.execute('select g.name,c.name,c.cog_name,cc.name,cp.name,group_concat(lt.name) from genes g join cog c on g.cog_id=c.id join cog_categories cc on c.cog_category_id=cc.id join cog_pathways cp on c.cog_pathway_id=cp.id join gene_locus_tags glt on glt.gene_id=g.id join locus_tags lt on lt.id=glt.locus_tag_id group by g.name order by g.name')
     result = []
-    for gene, cog_id, cog_name, category_name, pathway_name in cursor.fetchall():
+    for gene, cog_id, cog_name, category_name, pathway_name, locus_tags in cursor.fetchall():
         result.append({'representative': gene, 'cog_id': cog_id, 'cog_name': cog_name,
-                       'cog_category': category_name, 'cog_pathway': pathway_name})
+                       'cog_category': category_name, 'cog_pathway': pathway_name,
+                       'old_name': _old_name_from_locus_tags(locus_tags)})
 
     return jsonify(entries=result, num_entries=len(result))
 
@@ -212,10 +239,11 @@ def cog_info_entries():
 def is_info_entries():
     conn = mysql_conn()
     cursor = conn.cursor()
-    cursor.execute('select g.name,ins.name,ins.family,ins.subgroup from genes g join insertion_sequences ins on g.is_id=ins.id')
+    cursor.execute('select g.name,ins.name,ins.family,ins.subgroup,group_concat(lt.name) from genes g join insertion_sequences ins on g.is_id=ins.id join gene_locus_tags glt on glt.gene_id=g.id join locus_tags lt on lt.id=glt.locus_tag_id group by g.name order by g.name')
     result = []
-    for gene, ins_name, ins_family, ins_subgroup in cursor.fetchall():
-        result.append({'representative': gene, 'is_name': ins_name, 'is_family': ins_family, 'is_subgroup': ins_subgroup})
+    for gene, ins_name, ins_family, ins_subgroup, locus_tags in cursor.fetchall():
+        result.append({'representative': gene, 'is_name': ins_name, 'is_family': ins_family,
+                       'is_subgroup': ins_subgroup, 'old_name': _old_name_from_locus_tags(locus_tags)})
 
     return jsonify(entries=result, num_entries=len(result))
 
@@ -233,13 +261,18 @@ def solr_search(search_term):
     for doc in solr_result:
 
         ## ADD MISSING FIELDS TODO
+        try:
+            func_desc = doc['functional_description']
+        except:
+            func_desc = ''
         result.append({'location': '',
                        'gene_symbol': doc['gene_symbol'],
                        'new_name': doc['id'],
                        'full_gene_name': doc['locus_tag'],
-                       'aliases': doc['aliases'], 'functional_description': doc['functional_description']})
+                       'aliases': doc['aliases'], 'functional_description': func_desc})
 
     return jsonify(results=result, num_results=len(result))
+
 
 @app.route('/search/<search_term>')
 def search(search_term):

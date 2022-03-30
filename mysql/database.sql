@@ -1,11 +1,29 @@
+drop table if exists cog;
+drop table if exists cog_categories;
+drop table if exists cog_pathways;
+drop table if exists gene_locus_tags;
+drop table if exists genes;
+drop table if exists insertion_sequences;
+drop table if exists locus_tags;
+
 create table if not exists genes (
   id integer primary key auto_increment,
   name varchar(20) not null unique,
-  old_name varchar(20),
+  gene_symbol varchar(20),
   product varchar(200),
   cog_id integer,
   is_id integer,
   sequence varchar(8000));
+
+create table if not exists locus_tags (
+  id integer primary key auto_increment,
+  name varchar(20) not null unique
+);
+
+create table if not exists gene_locus_tags (
+  gene_id integer not null,
+  locus_tag_id integer not null
+);
 
 create table cog (
   id integer primary key auto_increment,

@@ -2,10 +2,10 @@
 <v-container>
   <v-spacer style="height: 32pt"></v-spacer>
   <v-row v-if="newInfo">
-    <span style="font-size: 16pt"><b>{{newInfo.gene}}</b> ({{$route.params.gene}}, {{proteinStructureData.common_name}})</span>&nbsp;
+    <span style="font-size: 16pt"><b>{{newInfo.gene}}</b> ({{$route.params.gene}}, {{newInfo.gene_symbol}})</span>&nbsp;
     <span style="font-size: 16pt; vertical-align: bottom">{{proteinStructureData.function}}</span>
   </v-row>
-  <v-row v-else>
+  <v-row v-else-if="proteinStructureData">
     <span style="font-size: 16pt"><b>{{$route.params.gene}}</b> ({{proteinStructureData.common_name}})</span>&nbsp;
     <span style="font-size: 16pt; vertical-align: bottom">{{proteinStructureData.function}}</span>
   </v-row>
@@ -194,8 +194,17 @@ export default {
                     wholeGenomeView: false
                 },
                 tracks: [
+                    /*
                     {
-                        url: STATIC_URL + "ribosomal_RNA_TP2-fwd2.bedgraph.gz",
+                        url: STATIC_URL + "ribosomal_RNA_TP1-fwd.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "ribo",
+                        name: "Ribo-Seq TP1 (+)",
+                        color: "darkgrey"
+                    },
+                    {
+                        url: STATIC_URL + "ribosomal_RNA_TP2-fwd.bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
@@ -203,11 +212,53 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "total-RNA-TP2-rev2.bedgraph.gz",
+                        url: STATIC_URL + "ribosomal_RNA_TP3-fwd.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "ribo",
+                        name: "Ribo-Seq TP3 (+)",
+                        color: "darkgrey"
+                        },*/
+                    {
+                        url: STATIC_URL + "ribosomal_RNA_TP4-fwd.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "ribo",
+                        name: "Ribo-Seq TP4 (+)",
+                        color: "darkgrey"
+                    },
+
+                    /*
+                    {
+                        url: STATIC_URL + "total-RNA-TP1-rev.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "tot",
+                        name: "RNA-Seq TP1 (+)",
+                        color: "darkgrey"
+                    },
+                    {
+                        url: STATIC_URL + "total-RNA-TP2-rev.bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "tot",
                         name: "RNA-Seq TP2 (+)",
+                        color: "darkgrey"
+                    },
+                    {
+                        url: STATIC_URL + "total-RNA-TP3-rev.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "tot",
+                        name: "RNA-Seq TP3 (+)",
+                        color: "darkgrey"
+                    },*/
+                    {
+                        url: STATIC_URL + "total-RNA-TP4-rev.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "tot",
+                        name: "RNA-Seq TP4 (+)",
                         color: "darkgrey"
                     },
                     {
@@ -220,19 +271,10 @@ export default {
                         displayMode: "SQUISHED"
                     },
                     {
-                        url: STATIC_URL + "br1biorep1-interaction-regions-entire-genome-fwd2.gff3",
+                        url: STATIC_URL + "mergedBRs_interaction-regions-entire-genome-fwd.gff3",
                         type: "annotation",
                         format: "gff3",
-                        name: "SmAP1 interaction (+) Rep 1",
-                        height: 30,
-                        color: "#E15759",
-                        displayMode: "SQUISHED"
-                    },
-                    {
-                        url: STATIC_URL + "br2biorep2-interaction-regions-entire-genome-fwd2.gff3",
-                        type: "annotation",
-                        format: "gff3",
-                        name: "SmAP1 interaction (+) Rep 2",
+                        name: "SmAP1 interaction (+)",
                         height: 30,
                         color: "#E15759",
                         displayMode: "SQUISHED"
@@ -264,19 +306,10 @@ export default {
                         displayMode: "COLLAPSED"
                     },
                     {
-                        url: STATIC_URL + "br1biorep1-interaction-regions-entire-genome-rev2.gff3",
+                        url: STATIC_URL + "mergedBRs_interaction-regions-entire-genome-rev.gff3",
                         type: "annotation",
                         format: "gff3",
-                        name: "SmAP1 interaction (-) Rep 1",
-                        height: 30,
-                        color: "#E15759",
-                        displayMode: "SQUISHED"
-                    },
-                    {
-                        url: STATIC_URL + "br2biorep2-interaction-regions-entire-genome-rev2.gff3",
-                        type: "annotation",
-                        format: "gff3",
-                        name: "SmAP1 interaction (-) Rep 2",
+                        name: "SmAP1 interaction (-)",
                         height: 30,
                         color: "#E15759",
                         displayMode: "SQUISHED"
@@ -290,15 +323,48 @@ export default {
                         color: "#59A14F",
                         displayMode: "SQUISHED"
                     },
+                    /*
                     {
-                        url: STATIC_URL + "ribosomal_RNA_TP2-rev2.bedgraph.gz",
+                        url: STATIC_URL + "ribosomal_RNA_TP1-rev.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "ribo",
+                        name: "Ribo-Seq TP1 (-)",
+                        color: "darkgrey"
+                    },
+                    {
+                        url: STATIC_URL + "ribosomal_RNA_TP2-rev.bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP2 (-)",
                         color: "darkgrey"
                     },
+                    {
+                        url: STATIC_URL + "ribosomal_RNA_TP3-rev.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "ribo",
+                        name: "Ribo-Seq TP3 (-)",
+                        color: "darkgrey"
+                    },*/
+                    {
+                        url: STATIC_URL + "ribosomal_RNA_TP4-rev.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "ribo",
+                        name: "Ribo-Seq TP4 (-)",
+                        color: "darkgrey"
+                    },
                     /*
+                    {
+                        url: STATIC_URL + "total-RNA-TP1-fwd.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "tot",
+                        name: "RNA-Seq TP1 (-)",
+                        color: "darkgrey"
+                    },
                     {
                         url: STATIC_URL + "total-RNA-TP2-fwd.bedgraph.gz",
                         type: "wig",
@@ -306,7 +372,23 @@ export default {
                         autoscaleGroup: "tot",
                         name: "RNA-Seq TP2 (-)",
                         color: "darkgrey"
-                    }*/
+                    },
+                    {
+                        url: STATIC_URL + "total-RNA-TP3-fwd.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "tot",
+                        name: "RNA-Seq TP3 (-)",
+                        color: "darkgrey"
+                    },*/
+                    {
+                        url: STATIC_URL + "total-RNA-TP4-fwd.bedgraph.gz",
+                        type: "wig",
+                        format: "bedgraph",
+                        autoscaleGroup: "tot",
+                        name: "RNA-Seq TP4 (-)",
+                        color: "darkgrey"
+                    }
                 ]
             };
             igv.createBrowser(igvDiv, options)
@@ -328,6 +410,7 @@ export default {
         fetch(newInfoApi)
             .then((response) => { return response.json();
                                 }).then((result) => {
+                                    console.log(result.results);
                                     if (result.results.length > 0) {
                                         this.newInfo = result.results[0];
                                     }
