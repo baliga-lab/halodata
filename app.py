@@ -134,6 +134,9 @@ Check if the transcript link exists
 http://networks.systemsbiology.net/projects/halo/transcript_structure/VNG0002G.pdf
 """
 
+# Size of the IGV display window is +/- IGV_MARGIN
+IGV_MARGIN = 5000
+
 @app.route('/proteinstructure/<gene>')
 def protein_structure(gene):
     """
@@ -178,9 +181,10 @@ def protein_structure(gene):
             if key == 'location':
                 loc_comps = value.split(' ')
                 chr_id = chr_map[loc_comps[0]]
-                pstruct['igv_loc'] = '%s:%d-%d' % (chr_id,
-                                                   int(loc_comps[1]) - 50,
-                                                   int(loc_comps[2]) + 50)
+                left = int(loc_comps[1]) - IGV_MARGIN
+                left = max(1, left)
+                right = int(loc_comps[2]) + IGV_MARGIN
+                pstruct['igv_loc'] = '%s:%d-%d' % (chr_id, left, right)
 
     return jsonify(result=pstruct)
 
