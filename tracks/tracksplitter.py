@@ -25,13 +25,22 @@ def find_bucket(bucket_map, left, right):
             return bucket
     raise Exception('not found')
 
+
+HALO_SEQLEN = 2571034
+NUM_CHUNKS = 25
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                      description=DESCRIPTION)
     parser.add_argument('infile', help="input file")
-    parser.add_argument('-sl', '--seqlen', type=int, help='sequence length', default=2571034)
-    parser.add_argument('-nc', '--numchunks', type=int, help='number of chunks', default=20)
+    parser.add_argument('outdir', help='output directory')
+    parser.add_argument('-sl', '--seqlen', type=int, help='sequence length', default=HALO_SEQLEN)
+    parser.add_argument('-nc', '--numchunks', type=int, help='number of chunks', default=NUM_CHUNKS)
     args = parser.parse_args()
+
+    if not os.path.exists(args.outdir):
+        os.makedirs(args.outdir)
 
     intervals = steps(0, args.seqlen - 1, args.numchunks)
     buckets = []
@@ -44,7 +53,6 @@ if __name__ == '__main__':
         buckets.append((left, right))
         key = "%d-%d" % (left, right)
         bucket_map[key] = []
-    print(bucket_map)
 
     with gzip.open(args.infile) as infile:
         for line in infile:
@@ -61,8 +69,12 @@ if __name__ == '__main__':
             start, stop = key.split('-')
         except:
             print(key)
-        final_filename = '%s_%s-%s.bedgraph.gz'
+        final_filename = os.path.join(args.outdir, '%s_%s-%s.bedgraph.gz')
         with gzip.open(final_filename % (filename_stem, start, stop), 'wb') as outfile:
             for reqseq, start, stop, value in bucket:
                 outline = '%s\t%d\t%d\t%s\n' % (refseq, start, stop, value)
                 outfile.write(outline.encode('utf-8'))
+
+    with open(os.path.join(args.outdir, 'track_ranges.txt'), 'w') as outfile:
+        for key in bucket_map.keys():
+            outfile.write('%s\n' % key)

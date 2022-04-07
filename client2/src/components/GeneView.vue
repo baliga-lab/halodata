@@ -181,7 +181,8 @@ export default {
 
     }),
     methods: {
-        loadIGVBrowser: function(igvLoc) {
+        loadIGVBrowser: function(igvLoc, trackRange) {
+            console.log('track range: ' + trackRange);
             igv.removeAllBrowsers();
             var igvDiv = this.$refs.igv; //document.getElementById("igv");
             var self = this;
@@ -194,9 +195,8 @@ export default {
                     wholeGenomeView: false
                 },
                 tracks: [
-                    /*
                     {
-                        url: STATIC_URL + "ribosomal_RNA_TP1-fwd.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP1-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
@@ -204,7 +204,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "ribosomal_RNA_TP2-fwd.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP2-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
@@ -212,25 +212,23 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "ribosomal_RNA_TP3-fwd.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP3-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP3 (+)",
                         color: "darkgrey"
-                        },*/
+                        },
                     {
-                        url: STATIC_URL + "ribosomal_RNA_TP4-fwd.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP4-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP4 (+)",
                         color: "darkgrey"
                     },
-
-                    /*
                     {
-                        url: STATIC_URL + "total-RNA-TP1-rev.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/total-RNA-TP1-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "tot",
@@ -238,7 +236,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "total-RNA-TP2-rev.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/total-RNA-TP2-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "tot",
@@ -246,15 +244,15 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "total-RNA-TP3-rev.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/total-RNA-TP3-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "tot",
                         name: "RNA-Seq TP3 (+)",
                         color: "darkgrey"
-                    },*/
+                    },
                     {
-                        url: STATIC_URL + "total-RNA-TP4-rev.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/total-RNA-TP4-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "tot",
@@ -323,9 +321,8 @@ export default {
                         color: "#59A14F",
                         displayMode: "SQUISHED"
                     },
-                    /*
                     {
-                        url: STATIC_URL + "ribosomal_RNA_TP1-rev.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP1-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
@@ -333,7 +330,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "ribosomal_RNA_TP2-rev.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP2-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
@@ -341,24 +338,23 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "ribosomal_RNA_TP3-rev.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP3-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP3 (-)",
                         color: "darkgrey"
-                    },*/
+                    },
                     {
-                        url: STATIC_URL + "ribosomal_RNA_TP4-rev.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP4-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP4 (-)",
                         color: "darkgrey"
                     },
-                    /*
                     {
-                        url: STATIC_URL + "total-RNA-TP1-fwd.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/total-RNA-TP1-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "tot",
@@ -366,7 +362,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "total-RNA-TP2-fwd.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/total-RNA-TP2-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "tot",
@@ -374,15 +370,15 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "total-RNA-TP3-fwd.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/total-RNA-TP3-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "tot",
                         name: "RNA-Seq TP3 (-)",
                         color: "darkgrey"
-                    },*/
+                    },
                     {
-                        url: STATIC_URL + "total-RNA-TP4-fwd.bedgraph.gz",
+                        url: STATIC_URL + "split_tracks/total-RNA-TP4-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         autoscaleGroup: "tot",
@@ -428,7 +424,7 @@ export default {
                 // WW: loading the browser too early results in the div not
                 // existing sometimes, so we wrap it in a nextTick
                 this.$nextTick(() => {
-                    this.loadIGVBrowser(this.proteinStructureData.igv_loc);
+                    this.loadIGVBrowser(this.proteinStructureData.igv_loc, this.proteinStructureData.track_range);
                 });
                 this.cogLink = "https://www.ncbi.nlm.nih.gov/research/cog/cog/" + this.proteinStructureData.COG_ID + "/"
             });

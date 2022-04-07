@@ -83,6 +83,33 @@ def newinfo_for_old(gene):
     return jsonify(results=result)
 
 
+RANGE_BUCKETS = [
+    (0, 107126),
+    (107127, 214253),
+    (214254, 321379),
+    (321380, 428506),
+    (428507, 535632),
+    (535633, 642758),
+    (642759, 749885),
+    (749886, 857011),
+    (857012, 964137),
+    (964138, 1071264),
+    (1071265, 1178390),
+    (1178391, 1285516),
+    (1285517, 1392643),
+    (1392644, 1499769),
+    (1499770, 1606896),
+    (1606897, 1714022),
+    (1714023, 1821148),
+    (1821149, 1928275),
+    (1928276, 2035401),
+    (2035402, 2142528),
+    (2142529, 2249654),
+    (2249655, 2356780),
+    (2356781, 2463907),
+    (2463908, 2571033)
+]
+
 @app.route('/annotations/<gene>')
 def annotations(gene):
     conn = dbconn('ProteinStructure2')
@@ -185,6 +212,9 @@ def protein_structure(gene):
                 left = max(1, left)
                 right = int(loc_comps[2]) + IGV_MARGIN
                 pstruct['igv_loc'] = '%s:%d-%d' % (chr_id, left, right)
+                for r in RANGE_BUCKETS:
+                    if left >= r[0] and left <= r[1]:
+                        pstruct['track_range'] = '%d-%d' % (r[0], r[1])
 
     return jsonify(result=pstruct)
 
@@ -254,7 +284,7 @@ def is_info_entries():
 
 @app.route('/search2/<search_term>')
 def solr_search(search_term):
-    solr_url = "http://localhost:8983/solr/halodata/query"
+    solr_url = app.config['SOLR_QUERY_URL']
     solr_url += '?q=all:' + search_term
     print(solr_url)
     r = requests.get(solr_url)
