@@ -20,13 +20,16 @@
       <h2>No results found</h2>
     </v-row>
     <v-row>
-      <v-list-item v-for="(item, index) in results" :key="item.full_gene_name">
+      <v-list-item v-for="(item, index) in results" :key="item.coords">
         <v-list-item-content>
-          <v-list-item-title>{{index + 1}}. <router-link :to="{name: 'viewgene', params: {gene: item.full_gene_name}}">{{item.new_name}}</router-link>
+          <v-list-item-title>{{((page - 1) * perPage) + index + 1}}. <router-link :to="{name: 'viewgene', params: {gene: item.full_gene_name}}">{{item.new_name}}</router-link>
             ({{item.full_gene_name}}, {{item.gene_symbol}})</v-list-item-title>
           <v-list-item-subtitle>{{item.functional_description}}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
+    </v-row>
+    <v-row v-if="results.length > 0">
+      <v-pagination @input="onPageClicked" v-model="page" :length="Math.ceil(numEntries/perPage)"></v-pagination>
     </v-row>
 
 
@@ -43,18 +46,28 @@ export default {
         gene: '',
         results: [],
         noResults: false,
-
+        page: 1,
+        perPage: 10,
+        numEntries: 0
     }),
     methods: {
-        onSubmit: function() {
-            var searchApi = BASE_URL + '/search2/' + this.gene;
+        doSearch() {
+            var searchApi = BASE_URL + '/search2/' + this.gene + '&start=' + ((this.page - 1) * this.perPage);
             fetch(searchApi)
                 .then((response) => {
                     return response.json();
                 }).then((result) => {
                     this.results = result.results;
                     this.noResults = this.results.length == 0;
+                    this.numEntries = result.total;
                 });
+        },
+        onPageClicked: function() {
+            this.doSearch();
+        },
+        onSubmit: function() {
+            this.page = 1;
+            this.doSearch();
         }
     }
 

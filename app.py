@@ -331,10 +331,12 @@ def solr_search(search_term):
     print(solr_url)
     r = requests.get(solr_url)
     solr_result = r.json()
-    solr_result = solr_result['response']['docs']
-    print(solr_result)
+    total = solr_result['response']['numFound']
+    start = solr_result['response']['start']
+    solr_docs = solr_result['response']['docs']
+    print(solr_docs)
     result = []
-    for doc in solr_result:
+    for doc in solr_docs:
 
         ## ADD MISSING FIELDS TODO
         try:
@@ -347,7 +349,7 @@ def solr_search(search_term):
                        'full_gene_name': doc['locus_tag'],
                        'aliases': doc['aliases'], 'functional_description': func_desc})
 
-    return jsonify(results=result, num_results=len(result))
+    return jsonify(results=result, num_results=len(result), total=total, start=start)
 
 
 @app.route('/search/<search_term>')
