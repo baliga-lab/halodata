@@ -3,7 +3,7 @@
   <v-spacer style="height: 32pt"></v-spacer>
   <v-row v-if="newInfo">
     <span style="font-size: 16pt"><b>{{newInfo.gene}}</b> ({{$route.params.gene}}, {{newInfo.gene_symbol}})</span>&nbsp;
-    <span style="font-size: 16pt; vertical-align: bottom">{{proteinStructureData.function}}</span>
+    <span v-if="proteinStructureData" style="font-size: 16pt; vertical-align: bottom">{{proteinStructureData.function}}</span>
   </v-row>
   <v-row v-else-if="proteinStructureData">
     <span style="font-size: 16pt"><b>{{$route.params.gene}}</b> ({{proteinStructureData.common_name}})</span>&nbsp;

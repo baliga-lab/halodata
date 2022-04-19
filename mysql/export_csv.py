@@ -2,6 +2,11 @@
 import mysql.connector
 import pyodbc
 
+"""
+This script consolidates Halo data contained in MySQL and SBEAMS databases and exports
+into a CSV file compatible to the Solr schema
+"""
+
 def mysql_conn():
     return mysql.connector.connect(host="127.0.0.1", port=3306, user='root', database='halodata')
 

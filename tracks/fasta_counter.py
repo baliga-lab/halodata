@@ -9,11 +9,22 @@ if __name__ == '__main__':
                                      description=DESCRIPTION)
     parser.add_argument('infile', help="input file")
     args = parser.parse_args()
+    cur_chrom_seq = None
+    cur_chrom_name = None
+    chroms = {}
 
     with open(args.infile) as infile:
-        infile.readline()
-        seq = ""
         for line in infile:
-            seq += line.strip()
+            if line.startswith('>'):
+                if cur_chrom_name is not None:
+                    chroms[cur_chrom_name] = cur_chrom_seq
+                cur_chrom_seq = ''
+                cur_chrom_name = line.strip()[1:]
+            else:
+                cur_chrom_seq += line.strip()
+        # do the last chromosome at the end
+        chroms[cur_chrom_name] = cur_chrom_seq
 
-        print('genome size: %d' % len(seq))
+
+        for chrom, seq in chroms.items():
+            print('%s\t%d' % (chrom, len(seq)))

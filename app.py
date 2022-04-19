@@ -4,6 +4,7 @@ import json
 import os
 import traceback
 import pyodbc
+from collections import defaultdict
 
 import mysql.connector
 
@@ -82,6 +83,36 @@ def newinfo_for_old(gene):
             result.append(entry)
     return jsonify(results=result)
 
+
+TRACK_RANGES = [
+  'NC_002607.1:0-223804',
+  'NC_002607.1:223805-447608',
+  'NC_002607.1:447609-671413',
+  'NC_002607.1:671414-895217',
+  'NC_002607.1:895218-1119021',
+  'NC_002607.1:1119022-1342825',
+  'NC_002607.1:1342826-1566630',
+  'NC_002607.1:1566631-1790434',
+  'NC_002607.1:1790435-2014238',
+  'NC_001869.1:0-21261',
+  'NC_001869.1:21262-42521',
+  'NC_001869.1:42522-63782',
+  'NC_001869.1:63783-85042',
+  'NC_001869.1:85043-106303',
+  'NC_001869.1:106304-127563',
+  'NC_001869.1:127564-148824',
+  'NC_001869.1:148825-170084',
+  'NC_001869.1:170085-191345',
+  'NC_002608.1:0-40603',
+  'NC_002608.1:40604-81205',
+  'NC_002608.1:81206-121808',
+  'NC_002608.1:121809-162411',
+  'NC_002608.1:162412-203013',
+  'NC_002608.1:203014-243616',
+  'NC_002608.1:243617-284219',
+  'NC_002608.1:284220-324821',
+  'NC_002608.1:324822-365424',
+]
 
 RANGE_BUCKETS = [
     (0, 107126),
@@ -164,6 +195,16 @@ http://networks.systemsbiology.net/projects/halo/transcript_structure/VNG0002G.p
 # Size of the IGV display window is +/- IGV_MARGIN
 IGV_MARGIN = 5000
 
+def make_range_buckets():
+    result = defaultdict(list)
+    for entry in TRACK_RANGES:
+        chrom, interval = entry.split(':')
+        start, stop = interval.split('-')
+        start = int(start)
+        stop = int(stop)
+        result[chrom].append((start, stop))
+    return result
+
 @app.route('/proteinstructure/<gene>')
 def protein_structure(gene):
     """
@@ -182,6 +223,7 @@ def protein_structure(gene):
     http://www.ncbi.nlm.nih.gov/sutils/blink.cgi?pid=15789342
     """
     # Set id 2 = Amino acid, 5 = DNA
+    range_buckets = make_range_buckets()
     conn = dbconn('ProteinStructure2')
     cursor = conn.cursor()
     cursor.execute('select biosequence_id,biosequence_set_id,biosequence_gene_name,biosequence_desc,biosequence_seq from biosequence where biosequence_name=?', gene)
@@ -212,9 +254,9 @@ def protein_structure(gene):
                 left = max(1, left)
                 right = int(loc_comps[2]) + IGV_MARGIN
                 pstruct['igv_loc'] = '%s:%d-%d' % (chr_id, left, right)
-                for r in RANGE_BUCKETS:
+                for r in range_buckets[chr_id]:
                     if left >= r[0] and left <= r[1]:
-                        pstruct['track_range'] = '%d-%d' % (r[0], r[1])
+                        pstruct['track_range'] = '%s-%d-%d' % (chr_id, r[0], r[1])
 
     return jsonify(result=pstruct)
 

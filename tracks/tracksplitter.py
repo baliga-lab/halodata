@@ -16,18 +16,25 @@ def steps(start,end,n):
     step = (end-start)/float(n-1)
     return [int(round(start+x*step)) for x in range(n)]
 
-def find_bucket(bucket_map, left, right):
+def find_bucket(bucket_map, refseq, left, right):
     for key, bucket in bucket_map.items():
-        l, r = key.split('-')
-        l = int(l)
-        r = int(r)
-        if left >= l and left <= r:
-            return bucket
-    raise Exception('not found')
+        chrom, interval = key.split(':')
+        #print('scan chrom: %s with %s' % (chrom, refseq))
+        if chrom == refseq:
+            l, r = interval.split('-')
+            l = int(l)
+            r = int(r)
+            if left >= l and left <= r:
+                return key, bucket
+    raise Exception("not found: '%s'" % refseq)
 
 
-HALO_SEQLEN = 2571034
-NUM_CHUNKS = 25
+SEQLENS = {
+    'NC_002607.1': 2014239,
+    'NC_001869.1': 191346,
+    'NC_002608.1': 365425
+}
+NUM_CHUNKS = 10
 
 
 if __name__ == '__main__':
@@ -35,24 +42,27 @@ if __name__ == '__main__':
                                      description=DESCRIPTION)
     parser.add_argument('infile', help="input file")
     parser.add_argument('outdir', help='output directory')
-    parser.add_argument('-sl', '--seqlen', type=int, help='sequence length', default=HALO_SEQLEN)
     parser.add_argument('-nc', '--numchunks', type=int, help='number of chunks', default=NUM_CHUNKS)
     args = parser.parse_args()
 
     if not os.path.exists(args.outdir):
         os.makedirs(args.outdir)
 
-    intervals = steps(0, args.seqlen - 1, args.numchunks)
-    buckets = []
-    bucket_map = {}
-    for i in range(len(intervals) - 1):
-        left = intervals[i]
-        if i > 0:
-            left += 1
-        right = intervals[i + 1]
-        buckets.append((left, right))
-        key = "%d-%d" % (left, right)
-        bucket_map[key] = []
+    chrom_intervals = {}
+    for chrom, seqlen in SEQLENS.items():
+        intervals = steps(0, seqlen - 1, args.numchunks)
+        chrom_intervals[chrom] = intervals
+
+    # arrange every element in a bucket
+    bucket_map = {}  # all possible bucket keys
+    for chrom, intervals in chrom_intervals.items():
+        for i in range(len(intervals) - 1):
+            left = intervals[i]
+            if i > 0:
+                left += 1
+            right = intervals[i + 1]
+            key = "%s:%d-%d" % (chrom, left, right)
+            bucket_map[key] = []
 
     with gzip.open(args.infile) as infile:
         for line in infile:
@@ -60,21 +70,29 @@ if __name__ == '__main__':
             refseq, start, stop, value = line.split('\t')
             start = int(start)
             stop = int(stop)
-            bucket = find_bucket(bucket_map, start, stop)
+            bucket_key, bucket = find_bucket(bucket_map, refseq, start, stop)
+            if not bucket_key.startswith(refseq):
+                raise Exception('%s is not %s' % (bucket_key, refseq))
             bucket.append((refseq, start, stop, value))
 
     filename_stem = os.path.basename(args.infile).replace('.bedgraph.gz', '')
     for key, bucket in bucket_map.items():
+        print('process bucket "%s"' % key)
         try:
-            start, stop = key.split('-')
+            chrom, interval = key.split(':')
+            start, stop = interval.split('-')
         except:
             print(key)
-        final_filename = os.path.join(args.outdir, '%s_%s-%s.bedgraph.gz')
-        with gzip.open(final_filename % (filename_stem, start, stop), 'wb') as outfile:
-            for reqseq, start, stop, value in bucket:
+        final_filename = os.path.join(args.outdir, '%s_%s-%s-%s.bedgraph.gz')
+        final_filename2 = final_filename % (filename_stem, chrom, start, stop)
+        print("writing file: '%s'" % final_filename2)
+        with gzip.open(final_filename2, 'wb') as outfile:
+            for refseq, start, stop, value in bucket:
                 outline = '%s\t%d\t%d\t%s\n' % (refseq, start, stop, value)
                 outfile.write(outline.encode('utf-8'))
 
-    with open(os.path.join(args.outdir, 'track_ranges.txt'), 'w') as outfile:
+    with open(os.path.join(args.outdir, 'track_ranges.py'), 'w') as outfile:
+        outfile.write('TRACK_RANGES = [\n')
         for key in bucket_map.keys():
-            outfile.write('%s\n' % key)
+            outfile.write("  '%s',\n" % key)
+        outfile.write(']\n')
