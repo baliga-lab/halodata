@@ -43,16 +43,35 @@ def index():
     return "<p>Hello !</p>"
 
 
-@app.route('/newinfo_for_old/<gene>')
-def newinfo_for_old(gene):
+@app.route('/gene_info/<gene>')
+def gene_info(gene):
     conn = mysql_conn()
     result = []
     with conn.cursor() as cur:
-        q = """select distinct g.id
-               from genes g
-                 join gene_locus_tags glt on g.id=glt.gene_id
-                 join locus_tags lt on lt.id=glt.locus_tag_id
-               where lt.name=%s"""
+        # 1. hack: quick check if we are in extras
+        if gene.startswith('VNG_'):
+            q = "select name,gene_symbol,product,chrom,start_pos,end_pos from extra_genes where name=%s"
+            cur.execute(q, [gene])
+            row = cur.fetchone()
+            if row is not None:
+                name, gene_symbol, product, chrom, start_pos, end_pos = row
+                result = {'gene': name, 'gene_symbol': gene_symbol,
+                          'chrom': chrom, 'start': start_pos, 'stop': end_pos,
+                          'is_extra': True}
+                return jsonify(result=result)
+
+        if gene.startswith('VNG_'):
+            q = """select distinct g.id
+                   from genes g
+                     join gene_locus_tags glt on g.id=glt.gene_id
+                     join locus_tags lt on lt.id=glt.locus_tag_id
+                   where g.name=%s"""
+        else:
+            q = """select distinct g.id
+                   from genes g
+                     join gene_locus_tags glt on g.id=glt.gene_id
+                     join locus_tags lt on lt.id=glt.locus_tag_id
+                   where lt.name=%s"""
         cur.execute(q, [gene])
         gene_id = None
         for row in cur.fetchall():
@@ -72,7 +91,8 @@ def newinfo_for_old(gene):
                    where g.id=%s"""
         cur.execute(query, [gene_id])
         for gene,gene_symbol,cog_id,ccat,cpathway,ins_name,ins_family,ins_subgroup in cur.fetchall():
-            entry = {'gene': gene, 'gene_symbol': gene_symbol, 'cog_id': cog_id, 'cog_category': ccat}
+            entry = {'is_extra': False, 'gene': gene, 'gene_symbol': gene_symbol,
+                     'cog_id': cog_id, 'cog_category': ccat}
             print(entry)
             if cpathway is not None:
                 entry['cog_pathway'] = cpathway
@@ -81,6 +101,12 @@ def newinfo_for_old(gene):
                 entry['ins_family'] = ins_family
                 entry['ins_subgroup'] = ins_subgroup
             result.append(entry)
+        q = """select lt.name from locus_tags lt join gene_locus_tags glt on lt.id=glt.locus_tag_id join genes g on g.id=glt.gene_id
+               where g.id=%s"""
+        cur.execute(q, [gene_id])
+        for row in cur.fetchall():
+            if row[0].startswith('VNG') and not row[0].startswith('VNG_'):
+                entry['locus_tag'] = row[0]
     return jsonify(results=result)
 
 

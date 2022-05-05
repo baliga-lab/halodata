@@ -2,7 +2,7 @@
 <v-container>
   <v-spacer style="height: 32pt"></v-spacer>
   <v-row v-if="newInfo">
-    <span style="font-size: 16pt"><b>{{newInfo.gene}}</b> ({{$route.params.gene}}, {{newInfo.gene_symbol}})</span>&nbsp;
+    <span style="font-size: 16pt"><b>{{newInfo.gene}}</b> ({{newInfo.locus_tag}}, {{newInfo.gene_symbol}})</span>&nbsp;
     <span v-if="proteinStructureData" style="font-size: 16pt; vertical-align: bottom">{{proteinStructureData.function}}</span>
   </v-row>
   <v-row v-else-if="proteinStructureData">
@@ -395,39 +395,47 @@ export default {
     },
     mounted() {
         var gene = this.$route.params.gene;
-        var microarrayApi = BASE_URL + '/microarray_data/' + gene;
-        var newInfoApi = BASE_URL + '/newinfo_for_old/' + gene;
-        var proteinStructureApi = BASE_URL + '/proteinstructure/' + gene;
-        this.transcriptPDFLink = 'http://networks.systemsbiology.net/projects/halo/transcript_structure/' +
-            gene + '.pdf';
-        this.egrinLink = 'http://networks.systemsbiology.net/hal/gene/' + gene;
-        this.egrin2Link = 'http://egrin2.systemsbiology.net/genes/64091/' + gene;
-        this.downloadMicroarrayURL = BASE_URL + '/download_microarray_data/' + gene;
+        var newInfoApi = BASE_URL + '/gene_info/' + gene;
         fetch(newInfoApi)
             .then((response) => { return response.json();
                                 }).then((result) => {
                                     console.log(result.results);
                                     if (result.results.length > 0) {
                                         this.newInfo = result.results[0];
+
+                                        // now we almost always have the old locus tag for sure, fetch the rest
+                                        gene = this.newInfo.locus_tag;
+
+                                        var microarrayApi = BASE_URL + '/microarray_data/' + gene;
+                                        var proteinStructureApi = BASE_URL + '/proteinstructure/' + gene;
+                                        this.transcriptPDFLink = 'http://networks.systemsbiology.net/projects/halo/transcript_structure/' +
+                                            gene + '.pdf';
+                                        this.egrinLink = 'http://networks.systemsbiology.net/hal/gene/' + gene;
+                                        this.egrin2Link = 'http://egrin2.systemsbiology.net/genes/64091/' + gene;
+                                        this.downloadMicroarrayURL = BASE_URL + '/download_microarray_data/' + gene;
+
+                                        // SBEAMS Microarray
+                                        fetch(microarrayApi)
+                                            .then((response) => { return response.json();
+                                                                }).then((result) => {
+                                                                    this.microarrayData = result.expressions;
+                                                                });
+
+                                        // SBEAMS protein structure
+                                        fetch(proteinStructureApi)
+                                            .then((response) => {
+                                                return response.json();
+                                            }).then((result) => {
+                                                this.proteinStructureData = result.result;
+                                                // WW: loading the browser too early results in the div not
+                                                // existing sometimes, so we wrap it in a nextTick
+                                                this.$nextTick(() => {
+                                                    this.loadIGVBrowser(this.proteinStructureData.igv_loc, this.proteinStructureData.track_range);
+                                                });
+                                                this.cogLink = "https://www.ncbi.nlm.nih.gov/research/cog/cog/" + this.proteinStructureData.COG_ID + "/"
+                                            });
                                     }
                                 });
-        fetch(microarrayApi)
-            .then((response) => { return response.json();
-                                }).then((result) => {
-                                    this.microarrayData = result.expressions;
-                                });
-        fetch(proteinStructureApi)
-            .then((response) => {
-                return response.json();
-            }).then((result) => {
-                this.proteinStructureData = result.result;
-                // WW: loading the browser too early results in the div not
-                // existing sometimes, so we wrap it in a nextTick
-                this.$nextTick(() => {
-                    this.loadIGVBrowser(this.proteinStructureData.igv_loc, this.proteinStructureData.track_range);
-                });
-                this.cogLink = "https://www.ncbi.nlm.nih.gov/research/cog/cog/" + this.proteinStructureData.COG_ID + "/"
-            });
     },
 
   }
