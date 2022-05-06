@@ -38,6 +38,29 @@
     </v-col>
   </v-row>
 
+  <!-- EXTRA GENES instead of annotation -->
+  <v-row class="text-center" v-if="newInfo.is_extra">
+    <v-col class="mb-4">
+      <v-simple-table>
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">Gene Symbol</th>
+              <th class="text-left">Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left">{{newInfo.gene_symbol}}</td>
+              <td class="text-left">{{newInfo.location}}</td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </v-col>
+  </v-row>
+
+
   <v-row  style="text-align: left" v-if="newInfo">
     <h3>COG Information</h3>
   </v-row>
@@ -127,7 +150,7 @@
     </v-row>
     <v-spacer style="height: 20pt"></v-spacer>
 
-    <v-row>
+    <v-row v-if="proteinStructureData">
       <h3>Sequences</h3>
     </v-row>
     <v-row v-if="proteinStructureData">
@@ -399,7 +422,6 @@ export default {
         fetch(newInfoApi)
             .then((response) => { return response.json();
                                 }).then((result) => {
-                                    console.log(result.results);
                                     if (result.results.length > 0) {
                                         this.newInfo = result.results[0];
 
@@ -415,25 +437,39 @@ export default {
                                         this.downloadMicroarrayURL = BASE_URL + '/download_microarray_data/' + gene;
 
                                         // SBEAMS Microarray
-                                        fetch(microarrayApi)
-                                            .then((response) => { return response.json();
-                                                                }).then((result) => {
-                                                                    this.microarrayData = result.expressions;
-                                                                });
-
-                                        // SBEAMS protein structure
-                                        fetch(proteinStructureApi)
-                                            .then((response) => {
-                                                return response.json();
-                                            }).then((result) => {
-                                                this.proteinStructureData = result.result;
-                                                // WW: loading the browser too early results in the div not
-                                                // existing sometimes, so we wrap it in a nextTick
-                                                this.$nextTick(() => {
-                                                    this.loadIGVBrowser(this.proteinStructureData.igv_loc, this.proteinStructureData.track_range);
-                                                });
-                                                this.cogLink = "https://www.ncbi.nlm.nih.gov/research/cog/cog/" + this.proteinStructureData.COG_ID + "/"
+                                        if (this.newInfo.is_extra) {
+                                            console.log('is EXTRA');
+                                            // this is an extra gene, take the coordinates from the new info
+                                            // WW: loading the browser too early results in the div not
+                                            // existing sometimes, so we wrap it in a nextTick
+                                            console.log(this.newInfo.igv_loc);
+                                            console.log(this.newInfo.track_range);
+                                            this.$nextTick(() => {
+                                                this.loadIGVBrowser(this.newInfo.igv_loc, this.newInfo.track_range);
                                             });
+                                        }
+                                        if (!this.newInfo.is_extra) {
+                                            console.log('not extra');
+                                            fetch(microarrayApi)
+                                                .then((response) => { return response.json();
+                                                                    }).then((result) => {
+                                                                    this.microarrayData = result.expressions;
+                                                                    });
+
+                                            // SBEAMS protein structure
+                                            fetch(proteinStructureApi)
+                                                .then((response) => {
+                                                    return response.json();
+                                                }).then((result) => {
+                                                    this.proteinStructureData = result.result;
+                                                    // WW: loading the browser too early results in the div not
+                                                    // existing sometimes, so we wrap it in a nextTick
+                                                    this.$nextTick(() => {
+                                                        this.loadIGVBrowser(this.proteinStructureData.igv_loc, this.proteinStructureData.track_range);
+                                                    });
+                                                    this.cogLink = "https://www.ncbi.nlm.nih.gov/research/cog/cog/" + this.proteinStructureData.COG_ID + "/"
+                                                });
+                                        }
                                     }
                                 });
     },

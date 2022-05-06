@@ -5,7 +5,9 @@ drop table if exists gene_locus_tags;
 drop table if exists genes;
 drop table if exists insertion_sequences;
 drop table if exists locus_tags;
+/*
 drop table if exists extra_genes;
+*/
 
 create table if not exists genes (
   id integer primary key auto_increment,
@@ -14,8 +16,17 @@ create table if not exists genes (
   product varchar(200),
   cog_id integer,
   is_id integer,
-  sequence varchar(8000));
+  sequence varchar(8000),
 
+  /* new fields */
+  chrom varchar(20),
+  start_pos integer,
+  end_pos integer,
+  strand varchar(1),
+  is_extra integer
+);
+
+/*
 create table if not exists extra_genes (
   id integer primary key auto_increment,
   name varchar(20) not null unique,
@@ -26,6 +37,7 @@ create table if not exists extra_genes (
   end_pos integer,
   strand varchar(1)
 );
+*/
 
 create table if not exists locus_tags (
   id integer primary key auto_increment,

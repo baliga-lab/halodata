@@ -55,10 +55,14 @@ def gene_info(gene):
             row = cur.fetchone()
             if row is not None:
                 name, gene_symbol, product, chrom, start_pos, end_pos = row
-                result = {'gene': name, 'gene_symbol': gene_symbol,
-                          'chrom': chrom, 'start': start_pos, 'stop': end_pos,
-                          'is_extra': True}
-                return jsonify(result=result)
+                range_buckets = make_range_buckets()
+                # determine igv_loc and track_range
+                igv_loc = make_igv_loc(chrom, start_pos, end_pos)
+                track_range = make_track_range(range_buckets, chrom, start_pos, end_pos)
+                result = {'gene': name, 'gene_symbol': gene_symbol, 'locus_tag': name,
+                          'location': '%s %d %d' % (chrom, start_pos, end_pos),
+                          'is_extra': True, 'igv_loc': igv_loc, 'track_range': track_range}
+                return jsonify(results=[result])
 
         if gene.startswith('VNG_'):
             q = """select distinct g.id
@@ -276,15 +280,27 @@ def protein_structure(gene):
             if key == 'location':
                 loc_comps = value.split(' ')
                 chr_id = chr_map[loc_comps[0]]
-                left = int(loc_comps[1]) - IGV_MARGIN
-                left = max(1, left)
-                right = int(loc_comps[2]) + IGV_MARGIN
-                pstruct['igv_loc'] = '%s:%d-%d' % (chr_id, left, right)
-                for r in range_buckets[chr_id]:
-                    if left >= r[0] and left <= r[1]:
-                        pstruct['track_range'] = '%s-%d-%d' % (chr_id, r[0], r[1])
+                left = int(loc_comps[1])
+                right = int(loc_comps[2])
+                igv_loc = make_igv_loc(chr_id, left, right)
+                pstruct['igv_loc'] = igv_loc
+                pstruct['track_range'] = make_track_range(range_buckets, chr_id, left, right)
 
     return jsonify(result=pstruct)
+
+
+def make_igv_loc(chrom, left, right):
+    left = left - IGV_MARGIN
+    left = max(1, left)
+    right = right + IGV_MARGIN
+    return '%s:%d-%d' % (chrom, left, right)
+
+
+def make_track_range(range_buckets, chrom, left, right):
+    for r in range_buckets[chrom]:
+        if left >= r[0] and left <= r[1]:
+            return '%s-%d-%d' % (chrom, r[0], r[1])
+    return ''
 
 
 @app.route('/genes')
@@ -369,11 +385,15 @@ def solr_search(search_term):
             func_desc = doc['functional_description']
         except:
             func_desc = ''
+        try:
+            aliases = doc['aliases']
+        except:
+            aliases = ''
         result.append({'location': '',
                        'gene_symbol': doc['gene_symbol'],
                        'new_name': doc['id'],
                        'full_gene_name': doc['locus_tag'],
-                       'aliases': doc['aliases'], 'functional_description': func_desc})
+                       'aliases': aliases, 'functional_description': func_desc})
 
     return jsonify(results=result, num_results=len(result), total=total, start=start)
 

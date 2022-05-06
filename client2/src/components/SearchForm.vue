@@ -9,7 +9,6 @@
             <v-text-field
               v-model="gene"
               label="Search (e.g. VNG00001)"
-              @keydown="onChange"
               @keydown.enter="onSubmit">
             </v-text-field>
           </v-form>
@@ -145,10 +144,6 @@ export default {
         onSubmit: function() {
             this.page = 1;
             this.doSearch();
-        },
-        onChange: function(event) {
-            console.log(this.gene);
-            console.log(event.target.value);
         }
     }
 
