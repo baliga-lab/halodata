@@ -118,7 +118,7 @@ def import_cog_data(conn, cog_map):
     return cog_id_map
 
 
-def import_genes(conn):
+def import_genes(conn, gene_info_map):
     synonyms = read_synonyms()
     seqs = read_sequences()
     cog_map, gene2cog, symbol_map = read_cog_data()
@@ -166,16 +166,39 @@ def import_genes(conn):
             else:
                 is_name = None
 
+            try:
+                gene_info = gene_info_map[gene]
+            except:
+                gene_info = {'gene_symbol': '',
+                             'chrom': '', 'start': 0,
+                             'stop': 0, 'strand': ''}
+
             if cog_id is not None and is_name is not None:
-                cur.execute('insert into genes (name,gene_symbol,product,cog_id,is_id,sequence) values (%s,%s,%s,%s,%s,%s)',
-                            [gene, gene_symbol, product, cog_pk, is_id_map[is_name], seq])
+                cur.execute('insert into genes (name,gene_symbol,product,cog_id,is_id,sequence,chrom,start_pos,end_pos,strand) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+                            [gene, gene_symbol, product, cog_pk, is_id_map[is_name], seq,
+                             gene_info['chrom'], gene_info['start'],
+                             gene_info['stop'], gene_info['strand']
+                             ])
             elif cog_id is not None and is_name is None:
-                cur.execute('insert into genes (name,gene_symbol,product,cog_id,sequence) values (%s,%s,%s,%s,%s)',
-                            [gene, gene_symbol, product, cog_pk, seq])
+                cur.execute('insert into genes (name,gene_symbol,product,cog_id,sequence,chrom,start_pos,end_pos,strand) values (%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+                            [gene, gene_symbol, product, cog_pk, seq,
+                             gene_info['chrom'], gene_info['start'],
+                             gene_info['stop'], gene_info['strand']
+                             ])
 
             elif cog_id is None and is_name is None:
-                cur.execute('insert into genes (name,gene_symbol,product,sequence) values (%s,%s,%s,%s)',
-                            [gene, gene_symbol, product, seq])
+                cur.execute('insert into genes (name,gene_symbol,product,sequence,chrom,start_pos,end_pos,strand) values (%s,%s,%s,%s,%s,%s,%s,%s)',
+                            [gene, gene_symbol, product, seq,
+                             gene_info['chrom'], gene_info['start'],
+                             gene_info['stop'], gene_info['strand']
+                             ])
+            elif cog_id is None and is_name is not None:
+                cur.execute('insert into genes (name,gene_symbol,product,is_id,sequence,chrom,start_pos,end_pos,strand) values (%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+                            [gene, gene_symbol, product, is_id_map[is_name], seq,
+                             gene_info['chrom'], gene_info['start'],
+                             gene_info['stop'], gene_info['strand']
+                             ])
+
             gene_id = cur.lastrowid
             for locus_tag in locus_tags:
                 # add all LOCUS TAGS for that gene (TODO)
@@ -191,11 +214,58 @@ def import_genes(conn):
 
         conn.commit()
 
+def read_gene_tracks():
+    gene_track_map = {}
+    with open('genes.tsv') as infile:
+        for line in infile:
+            gene_symbol, locus_tag, chrom, start, stop, strand = line.strip().split('\t')
+            gene_track_map[locus_tag] = {'gene_symbol': gene_symbol,
+                                         'chrom': chrom, 'start': start,
+                                         'stop': stop, 'strand': strand}
+    return gene_track_map
+
+
+def mark_extra_genes(conn):
+    """Update the genes that have no locus tag as extra gene"""
+    with conn.cursor() as cur:
+        cur.execute('select id,name from genes')
+        for gene_id, gene_name in cur.fetchall():
+            cur2 = conn.cursor()
+            cur2.execute('select lt.name from locus_tags lt join gene_locus_tags glt on lt.id=glt.locus_tag_id join genes g on g.id=glt.gene_id where g.id=%s', [gene_id])
+            num_olds = 0
+            for row in cur2.fetchall():
+                name = row[0]
+                if name.startswith('VNG') and not name.startswith('VNG_'):
+                    num_olds += 1
+            if num_olds == 0:
+                cur2.execute('update genes set is_extra=1 where id=%s', [gene_id])
+        conn.commit()
+
+
+def import_extra_genes(conn, gene_track_map):
+    num_extras = 0
+    with conn.cursor() as cur:
+        for locus_tag, info in gene_track_map.items():
+            cur.execute('select count(*) from genes where name=%s', [locus_tag])
+            count = cur.fetchone()[0]
+            if count == 0:
+                print('locus_tag not found: %s' % locus_tag)
+                num_extras += 1
+                cur.execute('insert into genes (name,gene_symbol,chrom,start_pos,end_pos,strand,is_extra) values (%s,%s,%s,%s,%s,%s,%s)',
+                            [locus_tag, info['gene_symbol'], info['chrom'],
+                             info['start'], info['stop'], info['strand'], 1])
+        conn.commit()
+    print('num extras found: %d' % num_extras)
+
+
 if __name__ == '__main__':
+    gene_track_map = read_gene_tracks()
     conn = dbconn()
-    import_genes(conn)
+    import_genes(conn, gene_track_map)
     with conn.cursor() as cur:
         cur.execute('select count(*) from genes')
         num_genes = cur.fetchone()[0]
         print("# genes imported: ", num_genes)
+    mark_extra_genes(conn)
+    import_extra_genes(conn, gene_track_map)
     conn.close()

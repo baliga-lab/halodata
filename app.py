@@ -48,6 +48,7 @@ def gene_info(gene):
     conn = mysql_conn()
     result = []
     with conn.cursor() as cur:
+        """
         # 1. hack: quick check if we are in extras
         if gene.startswith('VNG_'):
             q = "select name,gene_symbol,product,chrom,start_pos,end_pos from extra_genes where name=%s"
@@ -62,14 +63,10 @@ def gene_info(gene):
                 result = {'gene': name, 'gene_symbol': gene_symbol, 'locus_tag': name,
                           'location': '%s %d %d' % (chrom, start_pos, end_pos),
                           'is_extra': True, 'igv_loc': igv_loc, 'track_range': track_range}
-                return jsonify(results=[result])
+                return jsonify(results=[result])"""
 
         if gene.startswith('VNG_'):
-            q = """select distinct g.id
-                   from genes g
-                     join gene_locus_tags glt on g.id=glt.gene_id
-                     join locus_tags lt on lt.id=glt.locus_tag_id
-                   where g.name=%s"""
+            q = """select id from genes where name=%s"""
         else:
             q = """select distinct g.id
                    from genes g
@@ -83,9 +80,13 @@ def gene_info(gene):
             break
         if gene_id is not None:
             print("Found Gene ID !!!!: ", gene_id)
+        else:
+            print("not found: ", gene)
 
+        range_buckets = make_range_buckets()
         query = """select
-                     g.name,g.gene_symbol,c.name as cog_id,cc.name as cog_category,cp.name as cog_pathway,
+                     g.name,g.gene_symbol,g.is_extra,g.chrom,g.start_pos,g.end_pos,
+                     c.name as cog_id,cc.name as cog_category,cp.name as cog_pathway,
                      ins.name as ins_name,ins.family as ins_family,ins.subgroup as ins_subgroup
                    from genes g
                      left outer join cog c on g.cog_id=c.id
@@ -94,9 +95,14 @@ def gene_info(gene):
                      left outer join insertion_sequences ins on g.is_id=ins.id
                    where g.id=%s"""
         cur.execute(query, [gene_id])
-        for gene,gene_symbol,cog_id,ccat,cpathway,ins_name,ins_family,ins_subgroup in cur.fetchall():
-            entry = {'is_extra': False, 'gene': gene, 'gene_symbol': gene_symbol,
-                     'cog_id': cog_id, 'cog_category': ccat}
+        for gene,gene_symbol,is_extra,chrom,start_pos,end_pos,cog_id,ccat,cpathway,ins_name,ins_family,ins_subgroup in cur.fetchall():
+            igv_loc = make_igv_loc(chrom, start_pos, end_pos)
+            track_range = make_track_range(range_buckets, chrom, start_pos, end_pos)
+            entry = {'is_extra': is_extra, 'gene': gene, 'gene_symbol': gene_symbol,
+                     'cog_id': cog_id, 'cog_category': ccat, 'chrom': chrom,
+                     'igv_loc': igv_loc, 'track_range': track_range}
+
+            # attach additional information
             print(entry)
             if cpathway is not None:
                 entry['cog_pathway'] = cpathway
@@ -389,8 +395,12 @@ def solr_search(search_term):
             aliases = doc['aliases']
         except:
             aliases = ''
+        try:
+            gene_symbol = doc['gene_symbol']
+        except:
+            gene_symbol = ''
         result.append({'location': '',
-                       'gene_symbol': doc['gene_symbol'],
+                       'gene_symbol': gene_symbol,
                        'new_name': doc['id'],
                        'full_gene_name': doc['locus_tag'],
                        'aliases': aliases, 'functional_description': func_desc})

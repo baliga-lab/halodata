@@ -44,7 +44,7 @@
   <field name="cog_name" type="string" indexed="true" stored="true" />
   <field name="cog_category" type="string" indexed="true" stored="true" />
   <field name="functional_description" type="string" indexed="true" stored="true" />
-  <field name="aliases" type="string" indexed="true" stored="true" />
+  <field name="aliases" type="string" indexed="true" multiValued="true" stored="true" />
   <!-- catch all -->
   <field name="all" type="text_general" indexed="true" stored="true" multiValued="true" />
 

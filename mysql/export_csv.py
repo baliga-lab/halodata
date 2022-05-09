@@ -28,7 +28,7 @@ left outer join cog c on c.id=g.cog_id
 left outer join cog_categories cc on c.cog_category_id=cc.id
 """
 
-FIELD_SEP = ','
+FIELD_SEP = '|'
 
 if __name__ == '__main__':
     mssql_conn = sqlserver_conn('ProteinStructure2')
@@ -51,6 +51,11 @@ if __name__ == '__main__':
             mysql_cur.execute(MYSQL_QUERY)
             for gene_id,product,cog_id,cog_name,cog_category in mysql_cur.fetchall():
                 cur2 = mysql_conn.cursor()
+                # first query
+                cur2.execute('select lt.name from locus_tags lt join gene_locus_tags glt on lt.id=glt.locus_tag_id join genes g on g.id=glt.gene_id and g.name=%s', [gene_id])
+                mysql_aliases = [row[0] for row in cur2.fetchall()]
+
+                # 2nd query to determine if this is a gene that is also in SBEAMS
                 cur2.execute('select lt.name from locus_tags lt join gene_locus_tags glt on lt.id=glt.locus_tag_id join genes g on g.id=glt.gene_id and g.name=%s', [gene_id])
                 for row in cur2.fetchall():
                     locus_tag = row[0]
@@ -78,6 +83,10 @@ if __name__ == '__main__':
                         functional_desc = ''
                     functional_desc = functional_desc.strip().replace('"', "'")
 
+                # add the aliases from MySQL
+                aliases = set(aliases.split(',') + mysql_aliases)
+                aliases = ','.join(aliases)
+
                 # output 1
                 out_row = [gene_id, locus_tag, gene_symbol, product, cog_id, cog_name, cog_category, aliases, functional_desc]
                 out_row2 = []
@@ -87,15 +96,3 @@ if __name__ == '__main__':
                     else:
                         out_row2.append('"' + str(elem) + '"')
                 print(FIELD_SEP.join(out_row2))
-
-        # part 2: export extra_genes
-        mysql_cur.execute('select name,gene_symbol,product from extra_genes')
-        for name, gene_symbol, product in mysql_cur.fetchall():
-            if gene_symbol is None:
-                gene_symbol = ''
-            if product is None:
-                product = ''
-            else:
-                product = '"%s"' % product
-            out_row = [name, name, gene_symbol, product, '', '', '', '', '']
-            print(FIELD_SEP.join(out_row))
