@@ -35,6 +35,7 @@
     <v-main>
       <router-view></router-view>
     </v-main>
+    <v-footer>&copy; 2022 A. Lorenzetti et al. Funding provided by S&atilde;o Paulo Research Foundation</v-footer>
   </v-app>
 </template>
 

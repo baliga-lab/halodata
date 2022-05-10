@@ -39,7 +39,7 @@
   </v-row>
 
   <!-- EXTRA GENES instead of annotation -->
-  <v-row class="text-center" v-if="newInfo.is_extra">
+  <v-row class="text-center" v-if="newInfo && newInfo.is_extra">
     <v-col class="mb-4">
       <v-simple-table>
         <template v-slot:default>
@@ -96,6 +96,7 @@
     <!-- Proceinstructure data -->
     <div style="text-align: left" v-if="proteinStructureData">
 
+      <v-spacer style="height: 40pt"></v-spacer>
       <v-row>
         <h3>Gene Regulatory Network</h3>
       </v-row>
@@ -436,20 +437,17 @@ export default {
                                         this.egrin2Link = 'http://egrin2.systemsbiology.net/genes/64091/' + gene;
                                         this.downloadMicroarrayURL = BASE_URL + '/download_microarray_data/' + gene;
 
-                                        // SBEAMS Microarray
-                                        if (this.newInfo.is_extra) {
-                                            console.log('is EXTRA');
-                                            // this is an extra gene, take the coordinates from the new info
-                                            // WW: loading the browser too early results in the div not
-                                            // existing sometimes, so we wrap it in a nextTick
-                                            console.log(this.newInfo.igv_loc);
-                                            console.log(this.newInfo.track_range);
+                                        // always take the coordinates from the new info structure unless there are none
+                                        // WW: loading the browser too early results in the div not
+                                        // existing sometimes, so we wrap it in a nextTick
+                                        if (this.newInfo.chrom != '') {
                                             this.$nextTick(() => {
                                                 this.loadIGVBrowser(this.newInfo.igv_loc, this.newInfo.track_range);
                                             });
                                         }
+
                                         if (!this.newInfo.is_extra) {
-                                            console.log('not extra');
+                                            // SBEAMS Microarray
                                             fetch(microarrayApi)
                                                 .then((response) => { return response.json();
                                                                     }).then((result) => {
@@ -462,12 +460,16 @@ export default {
                                                     return response.json();
                                                 }).then((result) => {
                                                     this.proteinStructureData = result.result;
-                                                    // WW: loading the browser too early results in the div not
-                                                    // existing sometimes, so we wrap it in a nextTick
-                                                    this.$nextTick(() => {
-                                                        this.loadIGVBrowser(this.proteinStructureData.igv_loc, this.proteinStructureData.track_range);
-                                                    });
-                                                    this.cogLink = "https://www.ncbi.nlm.nih.gov/research/cog/cog/" + this.proteinStructureData.COG_ID + "/"
+                                                    // there is no location for this gene in the default database table -> retrieve
+                                                    // from SBEAMS
+                                                    if (this.newInfo.chrom == '') {
+                                                        // WW: loading the browser too early results in the div not
+                                                        // existing sometimes, so we wrap it in a nextTick
+                                                        this.$nextTick(() => {
+                                                            this.loadIGVBrowser(this.proteinStructureData.igv_loc, this.proteinStructureData.track_range);
+                                                        });
+                                                        this.cogLink = "https://www.ncbi.nlm.nih.gov/research/cog/cog/" + this.proteinStructureData.COG_ID + "/";
+                                                    }
                                                 });
                                         }
                                     }

@@ -48,26 +48,11 @@ def gene_info(gene):
     conn = mysql_conn()
     result = []
     with conn.cursor() as cur:
-        """
-        # 1. hack: quick check if we are in extras
         if gene.startswith('VNG_'):
-            q = "select name,gene_symbol,product,chrom,start_pos,end_pos from extra_genes where name=%s"
-            cur.execute(q, [gene])
-            row = cur.fetchone()
-            if row is not None:
-                name, gene_symbol, product, chrom, start_pos, end_pos = row
-                range_buckets = make_range_buckets()
-                # determine igv_loc and track_range
-                igv_loc = make_igv_loc(chrom, start_pos, end_pos)
-                track_range = make_track_range(range_buckets, chrom, start_pos, end_pos)
-                result = {'gene': name, 'gene_symbol': gene_symbol, 'locus_tag': name,
-                          'location': '%s %d %d' % (chrom, start_pos, end_pos),
-                          'is_extra': True, 'igv_loc': igv_loc, 'track_range': track_range}
-                return jsonify(results=[result])"""
-
-        if gene.startswith('VNG_'):
+            # search by gene name
             q = """select id from genes where name=%s"""
         else:
+            # search by locus tag
             q = """select distinct g.id
                    from genes g
                      join gene_locus_tags glt on g.id=glt.gene_id
@@ -78,10 +63,6 @@ def gene_info(gene):
         for row in cur.fetchall():
             gene_id = row[0]
             break
-        if gene_id is not None:
-            print("Found Gene ID !!!!: ", gene_id)
-        else:
-            print("not found: ", gene)
 
         range_buckets = make_range_buckets()
         query = """select
@@ -117,6 +98,7 @@ def gene_info(gene):
         for row in cur.fetchall():
             if row[0].startswith('VNG') and not row[0].startswith('VNG_'):
                 entry['locus_tag'] = row[0]
+    print(result)
     return jsonify(results=result)
 
 

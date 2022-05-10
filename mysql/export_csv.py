@@ -23,7 +23,7 @@ def sqlserver_conn(dbname):
                                                                             DBPASS)
     return pyodbc.connect(conn_str)
 
-MYSQL_QUERY = """select g.name,g.product,c.name,c.cog_name,cc.name from genes g
+MYSQL_QUERY = """select g.name,g.gene_symbol,g.product,c.name,c.cog_name,cc.name from genes g
 left outer join cog c on c.id=g.cog_id
 left outer join cog_categories cc on c.cog_category_id=cc.id
 """
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     with mysql_conn.cursor() as mysql_cur:
         with mssql_conn.cursor() as mssql_cur:
             mysql_cur.execute(MYSQL_QUERY)
-            for gene_id,product,cog_id,cog_name,cog_category in mysql_cur.fetchall():
+            for gene_id,gene_symbol,product,cog_id,cog_name,cog_category in mysql_cur.fetchall():
                 cur2 = mysql_conn.cursor()
                 # first query
                 cur2.execute('select lt.name from locus_tags lt join gene_locus_tags glt on lt.id=glt.locus_tag_id join genes g on g.id=glt.gene_id and g.name=%s', [gene_id])
@@ -70,10 +70,12 @@ if __name__ == '__main__':
                 else:
                     search_sbeams = True
 
-                try:
-                    gene_symbol = gene_symbol_map[locus_tag]
-                except:
-                    gene_symbol = ''
+                if gene_symbol is None:
+                    # fallback: retrieve gene symbol from SBEAMS if not available
+                    try:
+                        gene_symbol = gene_symbol_map[locus_tag]
+                    except:
+                        gene_symbol = ''
 
                 if search_sbeams:
                     mssql_cur.execute('select aliases,functional_description from biosequence_annotation ba join biosequence bs on ba.biosequence_id=bs.biosequence_id where full_gene_name=?', locus_tag)
