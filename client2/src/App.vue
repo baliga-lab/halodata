@@ -6,10 +6,9 @@
       dark
     >
       <div class="d-flex align-center">
-      <span style="font-size: 18pt">HaloData</span>
+        <span style="font-size: 18pt">HaloData&nbsp;&nbsp;&nbsp;</span>
       </div>
 
-      <v-btn text></v-btn>
       <v-btn to="/" text>Home</v-btn>
       <v-btn to="/heatmap" text>Atlas</v-btn>
       <v-btn to="/datatables" text>Browse</v-btn>
