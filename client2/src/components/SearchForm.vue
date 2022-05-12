@@ -4,7 +4,7 @@
 
       <v-col class="mb-4">
         <h2 class="display-2 font-weight-bold mb-3">Gene Search</h2>
-        <div>
+        <div v-if="false">
           <v-form ref="form" @submit.prevent>
             <v-text-field
               v-model="gene"
@@ -16,26 +16,24 @@
 
       </v-col>
     </v-row>
-    <v-row v-if="false" class="text-center">
+    <v-row class="text-center">
       <v-col class="mb-4">
         <v-autocomplete v-model="autocompleteModel"
                         :items="autocompleteItems"
                         :loading="isAutocompleteLoading"
                         :search-input.sync="autocompleteSearch"
                         color="white"
-                        hide-no-data
-                        hide-selected
                         item-text="Description"
                         item-value="API"
-                        label="Public APIs"
-                        placeholder="Start typing to Search"
+                        label="Search (e.g. VNG0002G)"
+                        placeholder="Search (e.g. VNG0002G)"
                         prepend-icon="mdi-database-search"
+                        @change="onAutocompleteChange"
+                        clearable
                         return-object>
         </v-autocomplete>
         <v-expand-transition>
-          <v-list
-            v-if="autocompleteModel"
-            class="red ligthten-3">
+          <v-list v-if="autocompleteModel">
             <v-list-item
               v-for="(field, i) in fields"
               :key="i">
@@ -109,26 +107,30 @@ export default {
     },
     watch: {
         autocompleteSearch (val) {
-            if (val.length <= 4) return;
-            if (this.autocompleteItems.length > 0) return;
+            if (val == null || val.length < 3) return;
             if (this.isAutocompleteLoading) return;
             this.isAutocompleteLoading = true;
             fetch(BASE_URL + '/autocomplete/' + val)
                 .then(res => { return res.json() })
                 .then(res => {
                     const { count, entries } = res;
-                    this.autocompleteCount = count;
+                    var finalCount = count;
+                    if (count > 1) {
+                        entries.unshift({'Description': val + '*' });
+                        finalCount += 1;
+                    }
+                    this.autocompleteCount = finalCount;
                     this.autocompleteEntries = entries;
                 })
                 .catch (err => {
                     console.log(err)
                 })
-                .finally(() => (this.isAutoCompleteLoading = false))
+                .finally(() => (this.isAutocompleteLoading = false))
         }
     },
     methods: {
-        doSearch() {
-            var searchApi = BASE_URL + '/search2/' + this.gene + '&start=' + ((this.page - 1) * this.perPage);
+        doSearch(searchTerm) {
+            var searchApi = BASE_URL + '/search2/' + searchTerm + '&start=' + ((this.page - 1) * this.perPage);
             fetch(searchApi)
                 .then((response) => {
                     return response.json();
@@ -139,11 +141,18 @@ export default {
                 });
         },
         onPageClicked: function() {
-            this.doSearch();
+            this.doSearch(this.gene);
         },
         onSubmit: function() {
             this.page = 1;
-            this.doSearch();
+            this.doSearch(this.gene);
+        },
+        onAutocompleteChange: function() {
+            if (this.autocompleteModel) {
+                this.doSearch(this.autocompleteModel.Description);
+            } else {
+                console.log('not found');
+            }
         }
     }
 
