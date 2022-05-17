@@ -86,91 +86,87 @@
   </v-row>
 
     <!-- IGV Browser -->
-  <v-row  style="text-align: left" v-if="proteinStructureData">
+  <v-row  style="text-align: left">
     <h3>Genome Browser</h3>
   </v-row>
   <v-row>
     <div id="igv" ref="igv"></div>
   </v-row>
 
-    <!-- Proceinstructure data -->
-    <div style="text-align: left" v-if="proteinStructureData">
+  <!-- Proceinstructure data -->
 
-      <v-spacer style="height: 40pt"></v-spacer>
-      <v-row>
-        <h3>Gene Regulatory Network</h3>
-      </v-row>
-      <v-spacer style="height: 12pt"></v-spacer>
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-subtitle>
-            <a :href="egrinLink" target="_blank">EGRIN</a>&nbsp;
-            <a :href="egrin2Link" target="_blank">EGRIN2.0</a>
-          </v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-      <v-spacer style="height: 12pt"></v-spacer>
-      <v-row>
-        <h3>Transcript Structure</h3>
-      </v-row>
-      <v-list-item>
-        <v-list-item-content>
-          <v-list-item-subtitle><a :href="transcriptPDFLink" target="_blank">PDF</a></v-list-item-subtitle>
-        </v-list-item-content>
-      </v-list-item>
-      <v-spacer style="height: 12pt"></v-spacer>
+  <v-spacer style="height: 40pt"></v-spacer>
+  <v-row v-if="proteinStructureData">
+    <h3>Gene Regulatory Network</h3>
+  </v-row>
+  <v-spacer style="height: 12pt"></v-spacer>
+  <v-list-item v-if="proteinStructureData">
+    <v-list-item-content>
+      <v-list-item-subtitle>
+        <a :href="egrinLink" target="_blank">EGRIN</a>&nbsp;
+        <a :href="egrin2Link" target="_blank">EGRIN2.0</a>
+      </v-list-item-subtitle>
+    </v-list-item-content>
+  </v-list-item>
+  <v-spacer style="height: 12pt"></v-spacer>
+  <v-row v-if="proteinStructureData">
+    <h3>Transcript Structure</h3>
+  </v-row>
+  <v-list-item v-if="proteinStructureData">
+    <v-list-item-content>
+      <v-list-item-subtitle><a :href="transcriptPDFLink" target="_blank">PDF</a></v-list-item-subtitle>
+    </v-list-item-content>
+  </v-list-item>
+  <v-spacer style="height: 12pt"></v-spacer>
 
-    </div>
+  <v-spacer style="height: 20pt"></v-spacer>
+  <!-- Microarray data -->
+  <v-row v-if="microarrayData.length" class="text-center">
+    <h3>Data</h3>
+  </v-row>
+  <v-row v-if="microarrayData.length" class="text-center">
+    <v-expansion-panels>
+      <v-expansion-panel>
+        <v-expansion-panel-header>Microarray Data &nbsp; <a :href="downloadMicroarrayURL">Download</a></v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-data-table
+            :headers="maHeaders"
+            :items="microarrayData"
+            item-key="condition">
+            <template v-slot:item="{item}">
+              <tr>
+                <td style="text-align: left">{{item.condition}}</td>
+                <td >{{item.log10_ratio}}</td>
+                <td>{{item.lambda}}</td>
+              </tr>
+            </template>
+          </v-data-table>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
+  </v-row>
 
-    <v-spacer style="height: 20pt"></v-spacer>
-
-    <!-- Microarray data -->
-    <v-row v-if="microarrayData.length" class="text-center">
-      <h3>Data</h3> 
-    </v-row>
-    <v-row v-if="microarrayData.length" class="text-center">
-      <v-expansion-panels>
-        <v-expansion-panel>
-          <v-expansion-panel-header>Microarray Data &nbsp; <a :href="downloadMicroarrayURL">Download</a></v-expansion-panel-header>
-          <v-expansion-panel-content>
-            <v-data-table
-              :headers="maHeaders"
-              :items="microarrayData"
-              item-key="condition">
-              <template v-slot:item="{item}">
-                <tr>
-                  <td style="text-align: left">{{item.condition}}</td>
-                  <td >{{item.log10_ratio}}</td>
-                  <td>{{item.lambda}}</td>
-                </tr>
-              </template>
-            </v-data-table>
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
-    </v-row>
-    <v-spacer style="height: 20pt"></v-spacer>
-
-    <v-row v-if="proteinStructureData">
-      <h3>Sequences</h3>
-    </v-row>
-    <v-row v-if="proteinStructureData">
-      <v-expansion-panels>
-        <v-expansion-panel>
-          <v-expansion-panel-header>DNA</v-expansion-panel-header>
-          <v-expansion-panel-content style="font-family: Courier; font-size: 8pt; text-align: left">
-            {{proteinStructureData.dna}}
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-        <v-expansion-panel>
-          <v-expansion-panel-header>Peptide</v-expansion-panel-header>
-          <v-expansion-panel-content style="font-family: Courier; font-size: 8pt; text-align: left">
+  <v-spacer style="height: 20pt"></v-spacer>
+  <v-row v-if="proteinStructureData">
+    <h3>Sequences</h3>
+  </v-row>
+  <v-row v-if="proteinStructureData">
+    <v-expansion-panels>
+      <v-expansion-panel>
+        <v-expansion-panel-header>DNA</v-expansion-panel-header>
+        <v-expansion-panel-content style="font-family: Courier; font-size: 8pt; text-align: left">
+          {{proteinStructureData.dna}}
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <v-expansion-panel>
+        <v-expansion-panel-header>Peptide</v-expansion-panel-header>
+        <v-expansion-panel-content style="font-family: Courier; font-size: 8pt; text-align: left">
           {{proteinStructureData.peptide}}
-          </v-expansion-panel-content>
-        </v-expansion-panel>
-      </v-expansion-panels>
-    </v-row>
-    <v-spacer style="height: 20pt"></v-spacer>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
+  </v-row>
+  <v-spacer style="height: 20pt"></v-spacer>
   </v-container>
 </template>
 
@@ -414,6 +410,7 @@ export default {
             igv.createBrowser(igvDiv, options)
                 .then(function (browser) {
                     self.igv = browser;
+                    console.log('created browser');
             });
         }
     },

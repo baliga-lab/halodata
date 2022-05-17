@@ -59,7 +59,7 @@
     <v-row>
       <v-list-item v-for="(item, index) in results" :key="item.coords">
         <v-list-item-content>
-          <v-list-item-title>{{((page - 1) * perPage) + index + 1}}. <router-link :to="{name: 'viewgene', params: {gene: item.full_gene_name}}">{{item.new_name}}</router-link>
+          <v-list-item-title>{{((page - 1) * perPage) + index + 1}}. <router-link :to="{name: 'viewgene', params: {gene: item.new_name}}">{{item.new_name}}</router-link>
             ({{item.full_gene_name}}, {{item.gene_symbol}})</v-list-item-title>
           <v-list-item-subtitle>{{item.functional_description}}</v-list-item-subtitle>
           <v-list-item-subtitle>{{item.product}}</v-list-item-subtitle>
