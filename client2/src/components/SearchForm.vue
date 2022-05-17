@@ -46,6 +46,13 @@
         </v-expand-transition>
       </v-col>
     </v-row>
+    <v-row v-if="!noResults">
+      <v-col class="mb-4">
+      <p style="font-style: italic; margin-left: 20pt; margin-right: 20pt;">
+        Halo Data Atlas is an interactive web resource in order to support collaborative community-wide exploration and characterization of the H. salinarum NRC-1 multi-omics data.
+      </p>
+      </v-col>
+    </v-row>
     <v-row v-if="noResults" class="text-center">
       <h2>No results found</h2>
     </v-row>
@@ -55,6 +62,7 @@
           <v-list-item-title>{{((page - 1) * perPage) + index + 1}}. <router-link :to="{name: 'viewgene', params: {gene: item.full_gene_name}}">{{item.new_name}}</router-link>
             ({{item.full_gene_name}}, {{item.gene_symbol}})</v-list-item-title>
           <v-list-item-subtitle>{{item.functional_description}}</v-list-item-subtitle>
+          <v-list-item-subtitle>{{item.product}}</v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
     </v-row>

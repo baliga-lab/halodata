@@ -334,9 +334,11 @@ def cog_info_entries():
     cursor.execute('select g.name,c.name,c.cog_name,cc.name,cp.name,group_concat(lt.name) from genes g join cog c on g.cog_id=c.id join cog_categories cc on c.cog_category_id=cc.id join cog_pathways cp on c.cog_pathway_id=cp.id join gene_locus_tags glt on glt.gene_id=g.id join locus_tags lt on lt.id=glt.locus_tag_id group by g.name order by g.name')
     result = []
     for gene, cog_id, cog_name, category_name, pathway_name, locus_tags in cursor.fetchall():
+        cog_ids = cog_id.split('|')
         result.append({'representative': gene, 'cog_id': cog_id, 'cog_name': cog_name,
                        'cog_category': category_name, 'cog_pathway': pathway_name,
-                       'old_name': _old_name_from_locus_tags(locus_tags)})
+                       'old_name': _old_name_from_locus_tags(locus_tags),
+                       'cog_ids': cog_ids})
 
     return jsonify(entries=result, num_entries=len(result))
 
@@ -358,7 +360,7 @@ def is_info_entries():
 def solr_search(search_term):
     solr_url = app.config['SOLR_QUERY_URL']
     solr_url += '?q=all:' + search_term
-    print(solr_url)
+    print("QUERY: " + solr_url)
     r = requests.get(solr_url)
     solr_result = r.json()
     total = solr_result['response']['numFound']
@@ -381,10 +383,15 @@ def solr_search(search_term):
             gene_symbol = doc['gene_symbol']
         except:
             gene_symbol = ''
+        try:
+            product = doc['product']
+        except:
+            product = ''
         result.append({'location': '',
                        'gene_symbol': gene_symbol,
                        'new_name': doc['id'],
                        'full_gene_name': doc['locus_tag'],
+                       'product': product,
                        'aliases': aliases, 'functional_description': func_desc})
 
     return jsonify(results=result, num_results=len(result), total=total, start=start)

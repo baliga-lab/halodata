@@ -6,12 +6,13 @@
       dark
     >
       <div class="d-flex align-center">
-        <span style="font-size: 18pt">HaloData&nbsp;&nbsp;&nbsp;</span>
+        <span style="font-size: 18pt">Halo Data Atlas&nbsp;&nbsp;&nbsp;</span>
       </div>
 
       <v-btn to="/" text>Home</v-btn>
       <v-btn to="/heatmap" text>Atlas</v-btn>
       <v-btn to="/datatables" text>Browse</v-btn>
+      <v-btn to="/about" text>About</v-btn>
       <v-spacer></v-spacer>
 
       <v-btn
@@ -34,7 +35,7 @@
     <v-main>
       <router-view></router-view>
     </v-main>
-    <v-footer>&copy; 2022 A. Lorenzetti et al. Funding provided by S&atilde;o Paulo Research Foundation</v-footer>
+    <v-footer>Developed by Baliga Lab at the Institute for Systems Biology</v-footer>
   </v-app>
 </template>
 
@@ -42,8 +43,9 @@
 
 export default {
     name: 'App',
-
-
+    created() {
+        document.title = "Halo Data Atlas"
+    },
     data: () => ({
     })
 };

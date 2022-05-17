@@ -4,6 +4,7 @@ import SearchForm from './components/SearchForm'
 import HeatMap from './components/HeatMap'
 import GeneView from './components/GeneView'
 import DataTables from './components/DataTables'
+import AboutPage from './components/AboutPage'
 
 Vue.use(Router)
 
@@ -30,6 +31,11 @@ export default new Router({
             path: '/datatables',
             name: 'datatables',
             component: DataTables
+        },
+        {
+            path: '/about',
+            name: 'about',
+            component: AboutPage
         }
     ]
 });

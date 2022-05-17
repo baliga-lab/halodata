@@ -66,7 +66,7 @@
               <template v-slot:item="{item}">
                 <tr>
                   <td style="text-align: left"><router-link :to="{name: 'viewgene', params: {gene: item.old_name}}">{{item.representative}}</router-link></td>
-                  <td ><a :href="makeCOGLink(item.cog_id)" target="_blank">{{item.cog_id}}</a></td>
+                  <td><span style="margin-right: 3pt;" v-for="cog_id in item.cog_ids" :key="cog_id"><a :href="makeCOGLink(cog_id)" target="_blank">{{cog_id}}</a></span></td>
                   <td>{{item.cog_name}}</td>
                   <td>{{item.cog_category}}</td>
                   <td>{{item.cog_pathway}}</td>
