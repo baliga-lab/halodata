@@ -3,7 +3,7 @@
     <v-row class="text-center">
 
       <v-col class="mb-4">
-        <h2 class="display-2 font-weight-bold mb-3">Gene Search</h2>
+        <h2 class="display-2 font-weight-bold mb-3">Halo Data Atlas</h2>
         <div v-if="false">
           <v-form ref="form" @submit.prevent>
             <v-text-field
@@ -48,7 +48,9 @@
     </v-row>
     <v-row v-if="!noResults">
       <v-col class="mb-4">
-      <p style="font-style: italic; margin-left: 20pt; margin-right: 20pt;">
+        <p style="font-style: italic; margin-left: 20pt; margin-top: 20pt; font-size: 10pt;">You can search for gene names, locus tags COG IDs or product names. You may use wildcards '*' in your search. The suggestions will automatically include a wildcard
+          entry at the top</p>
+        <p style="font-style: italic; margin-left: 20pt; margin-right: 20pt;">
         Halo Data Atlas is an interactive web resource in order to support collaborative community-wide exploration and characterization of the H. salinarum NRC-1 multi-omics data.
       </p>
       </v-col>

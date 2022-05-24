@@ -3,6 +3,7 @@
     <v-app-bar
       app
       color="primary"
+      hide-on-scroll
       dark
     >
       <div class="d-flex align-center">

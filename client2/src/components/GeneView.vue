@@ -216,6 +216,11 @@ export default {
                 },
                 tracks: [
                     {
+                        type: "sequence",
+                        order: -9007199254740991,
+                        frameTranslate: true
+                    },
+                    {
                         url: STATIC_URL + "split_tracks/ribosomal_RNA_TP1-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",

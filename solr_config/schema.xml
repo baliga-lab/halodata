@@ -39,11 +39,11 @@
   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
   <field name="locus_tag" type="string" indexed="true" stored="true"/>
   <field name="gene_symbol" type="string" indexed="true" stored="true"/>
-  <field name="product" type="text_general" indexed="true" stored="true" />
+  <field name="product" type="text_general" indexed="false" stored="true" />
   <field name="cog_id" type="string" indexed="true" stored="true" />
   <field name="cog_name" type="string" indexed="true" stored="true" />
   <field name="cog_category" type="string" indexed="true" stored="true" />
-  <field name="functional_description" type="string" indexed="true" stored="true" />
+  <field name="functional_description" type="string" indexed="false" stored="true" />
   <field name="aliases" type="string" indexed="true" multiValued="true" stored="true" />
   <!-- catch all -->
   <field name="all" type="text_general" indexed="true" stored="true" multiValued="true" />
@@ -51,10 +51,10 @@
   <copyField source="id" dest="all" maxChars="100" />
   <copyField source="locus_tag" dest="all" maxChars="100" />
   <copyField source="gene_symbol" dest="all" maxChars="100" />
-  <copyField source="product" dest="all" maxChars="1000" />
+  <!-- <copyField source="product" dest="all" maxChars="1000" /> -->
   <copyField source="cog_id" dest="all" maxChars="100" />
   <copyField source="cog_name" dest="all" maxChars="500" />
   <copyField source="cog_category" dest="all" maxChars="500" />
   <copyField source="aliases" dest="all" maxChars="500" />
-  <copyField source="functional_description" dest="all" maxChars="500" />
+  <!-- <copyField source="functional_description" dest="all" maxChars="500" /> -->
 </schema>
