@@ -7,8 +7,8 @@
     </v-col>
   </v-row>
   <v-row v-if="newInfo">
-    <span style="font-size: 16pt"><b>{{newInfo.gene}}</b> ({{newInfo.locus_tag}}, {{newInfo.gene_symbol}})</span>&nbsp;
-    <span v-if="proteinStructureData" style="font-size: 16pt; vertical-align: bottom">{{proteinStructureData.function}}</span>
+    <span style="font-size: 16pt"><b>{{newInfo.gene}}</b> {{altGeneDesc}}</span>&nbsp;
+    <span v-if="proteinStructureData" style="font-size: 16pt; vertical-align: bottom">{{newInfo.product}}</span>
   </v-row>
   <v-row v-else-if="proteinStructureData">
     <span style="font-size: 16pt"><b>{{$route.params.gene}}</b> ({{proteinStructureData.common_name}})</span>&nbsp;
@@ -193,6 +193,7 @@ export default {
         downloadMicroarrayURL: BASE_URL + '/download_microarray_data',
         proteinStructureData: null,
         newInfo: null,
+        altGeneDesc: '',
         maHeaders: [
           {text: 'Condition', value: 'condition'},
           {text: 'Log10 Ratio', value: 'log10_ratio'},
@@ -439,6 +440,15 @@ export default {
 
                                         // now we almost always have the old locus tag for sure, fetch the rest
                                         gene = this.newInfo.locus_tag;
+                                        if (this.newInfo.locus_tag || this.newInfo.gene_symbol) {
+                                            this.altGeneDesc = '(';
+                                            this.altGeneDesc += this.newInfo.locus_tag;
+                                            if (this.newInfo.gene_symbol) {
+                                                if (this.altGeneDesc.length > 1) { this.altGeneDesc += ', '; }
+                                                this.altGeneDesc += this.newInfo.gene_symbol;
+                                            }
+                                            this.altGeneDesc += ')';
+                                        }
 
                                         var microarrayApi = BASE_URL + '/microarray_data/' + gene;
                                         var proteinStructureApi = BASE_URL + '/proteinstructure/' + gene;
