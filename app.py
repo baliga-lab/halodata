@@ -8,7 +8,7 @@ from collections import defaultdict
 
 import mysql.connector
 
-from flask import Flask, render_template, jsonify, Response
+from flask import Flask, render_template, jsonify, Response, abort
 from flask_cors import CORS
 import requests
 
@@ -99,6 +99,8 @@ def gene_info(gene):
             if row[0].startswith('VNG') and not row[0].startswith('VNG_'):
                 entry['locus_tag'] = row[0]
     print(result)
+    if len(result) == 0:
+        abort(404)
     return jsonify(results=result)
 
 
@@ -321,6 +323,7 @@ def locus_tag_entries():
     result = []
     for name, product, locus_tags in cursor.fetchall():
         old_name = _old_name_from_locus_tags(locus_tags)
+        locus_tags = locus_tags.split(',')
         result.append({'representative': name, 'old_name': old_name, 'product': product,
                        'locus_tag': locus_tags})
 

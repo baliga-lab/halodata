@@ -1,9 +1,13 @@
 <template>
   <v-container>
     <v-row class="text-center">
-
       <v-col class="mb-4">
-        <h2 class="display-2 font-weight-bold mb-3">Browsable Tables</h2>
+        <h2 class="display-2 font-weight-bold mb-3">Halo Data Atlas</h2>
+      </v-col>
+    </v-row>
+    <v-row class="text-left">
+      <v-col class="mb-4">
+        <p style="font-style: italic">Type the gene locus tag or protein product in the search box to query for representative genes. Once you find the target representative gene, click on the locus tag (first or third column) to see it in the genome browser.</p>
       </v-col>
     </v-row>
 
@@ -34,9 +38,9 @@
               item-key="representative">
               <template v-slot:item="{item}">
                 <tr>
-                  <td style="text-align: left"><router-link :to="{name: 'viewgene', params: {gene: item.old_name}}">{{item.representative}}</router-link></td>
+                  <td style="text-align: left"><router-link :to="{name: 'viewgene', params: {gene: item.representative}}">{{item.representative}}</router-link></td>
                   <td >{{item.product}}</td>
-                  <td>{{item.locus_tag}}</td>
+                  <td><span style="margin-right: 3pt" v-for="locus_tag in item.locus_tag" :key="locus_tag"><span v-if="isInternalGene(locus_tag)"><router-link :to="{name: 'viewgene', params: {gene: locus_tag}}">{{locus_tag}}</router-link></span><span v-else>{{locus_tag}}</span></span></td>
                 </tr>
               </template>
             </v-data-table>
@@ -155,6 +159,9 @@ export default {
     methods: {
         makeCOGLink(cogID) {
             return COG_BASE_URL + cogID + "/";
+        },
+        isInternalGene(locus_tag) {
+            return locus_tag.startsWith('VNG_') && !locus_tag.startsWith('VNG_RS');
         }
     },
     mounted() {

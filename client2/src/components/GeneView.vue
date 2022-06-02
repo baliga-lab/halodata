@@ -1,6 +1,11 @@
 <template>
 <v-container>
   <v-spacer style="height: 32pt"></v-spacer>
+  <v-row v-if="geneDoesNotExist">
+    <v-col class="mb-4">
+      <h2>Gene '{{$route.params.gene}}' not found</h2>
+    </v-col>
+  </v-row>
   <v-row v-if="newInfo">
     <span style="font-size: 16pt"><b>{{newInfo.gene}}</b> ({{newInfo.locus_tag}}, {{newInfo.gene_symbol}})</span>&nbsp;
     <span v-if="proteinStructureData" style="font-size: 16pt; vertical-align: bottom">{{proteinStructureData.function}}</span>
@@ -86,10 +91,10 @@
   </v-row>
 
     <!-- IGV Browser -->
-  <v-row  style="text-align: left">
+  <v-row v-if="newInfo" style="text-align: left">
     <h3>Genome Browser</h3>
   </v-row>
-  <v-row>
+  <v-row v-if="newInfo">
     <div id="igv" ref="igv"></div>
   </v-row>
 
@@ -179,6 +184,7 @@ export default {
     name: 'GeneView',
 
     data: () => ({
+        geneDoesNotExist: false,
         transcriptPDFLink: '',
         egrinLink: '',
         egrin2Link: '',
@@ -208,6 +214,8 @@ export default {
             var self = this;
             var options = {
                 locus: igvLoc,
+                showNavigation: true,
+                showSVGButton: false,
                 reference: {
                     id: "Halobacterium salinarum NRC-1",
                     fastaURL: this.fastaURL,
@@ -422,6 +430,7 @@ export default {
     mounted() {
         var gene = this.$route.params.gene;
         var newInfoApi = BASE_URL + '/gene_info/' + gene;
+        var self = this;
         fetch(newInfoApi)
             .then((response) => { return response.json();
                                 }).then((result) => {
@@ -475,6 +484,9 @@ export default {
                                                 });
                                         }
                                     }
+                                }).catch(function() {
+                                    self.geneDoesNotExist = true;
+                                    console.log('gene not found');
                                 });
     },
 

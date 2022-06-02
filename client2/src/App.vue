@@ -12,7 +12,6 @@
 
       <v-btn to="/" text>Home</v-btn>
       <v-btn to="/heatmap" text>Atlas</v-btn>
-      <v-btn to="/datatables" text>Browse</v-btn>
       <v-btn to="/about" text>About</v-btn>
       <v-spacer></v-spacer>
 
@@ -25,11 +24,10 @@
           alt="Vuetify Logo"
           class="shrink mr-2"
           contain
-          src="@/assets/isb_logo-001.png"
+          src="@/assets/isb_logo-002.png"
           transition="scale-transition"
           width="200"
         />
-        <v-icon>mdi-open-in-new</v-icon>
       </v-btn>
     </v-app-bar>
 
