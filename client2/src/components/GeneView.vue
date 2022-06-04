@@ -202,12 +202,7 @@ export default {
 
     data: () => ({
         geneDoesNotExist: false,
-        transcriptPDFLink: '',
-        egrinLink: '',
-        egrin2Link: '',
-        cogLink: '',
         microarrayData: [],
-        downloadMicroarrayURL: BASE_URL + '/download_microarray_data',
         proteinStructureData: null,
         newInfo: null,
         altGeneDesc: '',
@@ -227,7 +222,24 @@ export default {
     computed: {
         uniprotLink() {
             return (this.newInfo) ? "https://www.uniprot.org/uniprot/" + this.newInfo.uniprot_id : '';
+        },
+        egrinLink() {
+            return this.newInfo ? 'http://networks.systemsbiology.net/hal/gene/' + this.newInfo.locus_tag : '';
+        },
+        egrin2Link() {
+            return this.newInfo ? 'http://egrin2.systemsbiology.net/genes/64091/' + this.newInfo.locus_tag : '';
+        },
+        downloadMicroarrayURL() {
+            return this.newInfo ? BASE_URL + '/download_microarray_data/' + this.newInfo.locus_tag : '';
+        },
+        cogLink() {
+            return this.newInfo ? "https://www.ncbi.nlm.nih.gov/research/cog/cog/" + this.newInfo.cog_id + "/" : '';
+        },
+        transcriptPDFLink() {
+            return this.newInfo ? 'http://networks.systemsbiology.net/projects/halo/transcript_structure/' +
+                this.newInfo.locus_tag + '.pdf' : '';
         }
+
     },
     methods: {
         loadIGVBrowser: function(igvLoc, trackRange) {
@@ -474,11 +486,6 @@ export default {
 
                                         var microarrayApi = BASE_URL + '/microarray_data/' + gene;
                                         var proteinStructureApi = BASE_URL + '/proteinstructure/' + gene;
-                                        this.transcriptPDFLink = 'http://networks.systemsbiology.net/projects/halo/transcript_structure/' +
-                                            gene + '.pdf';
-                                        this.egrinLink = 'http://networks.systemsbiology.net/hal/gene/' + gene;
-                                        this.egrin2Link = 'http://egrin2.systemsbiology.net/genes/64091/' + gene;
-                                        this.downloadMicroarrayURL = BASE_URL + '/download_microarray_data/' + gene;
 
                                         // always take the coordinates from the new info structure unless there are none
                                         // WW: loading the browser too early results in the div not
@@ -511,7 +518,6 @@ export default {
                                                         this.$nextTick(() => {
                                                             this.loadIGVBrowser(this.proteinStructureData.igv_loc, this.proteinStructureData.track_range);
                                                         });
-                                                        this.cogLink = "https://www.ncbi.nlm.nih.gov/research/cog/cog/" + this.proteinStructureData.COG_ID + "/";
                                                     }
                                                 });
                                         }
