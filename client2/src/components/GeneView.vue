@@ -10,14 +10,31 @@
     <span style="font-size: 16pt"><b>{{newInfo.gene}}</b> {{altGeneDesc}}</span>&nbsp;
     <span v-if="proteinStructureData" style="font-size: 16pt; vertical-align: bottom">{{newInfo.product}}</span>
   </v-row>
-  <v-row v-else-if="proteinStructureData">
-    <span style="font-size: 16pt"><b>{{$route.params.gene}}</b> ({{proteinStructureData.common_name}})</span>&nbsp;
-    <span style="font-size: 16pt; vertical-align: bottom">{{proteinStructureData.function}}</span>
-  </v-row>
   <v-spacer style="height: 48pt"></v-spacer>
   <v-row  style="text-align: left" v-if="proteinStructureData">
     <h3>Annotations</h3>
   </v-row>
+  <v-row class="text-center" v-if="newInfo">
+    <v-col class="mb-4">
+      <v-simple-table>
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">Uniprot ID</th>
+              <th class="text-left">STRING ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left"><a :href="uniprotLink" target="_blank">{{newInfo.uniprot_id}}</a></td>
+              <td class="text-left">{{newInfo.string_id}}</td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </v-col>
+  </v-row>
+
   <v-row class="text-center" v-if="proteinStructureData">
     <v-col class="mb-4">
       <v-simple-table>
@@ -207,6 +224,11 @@ export default {
         igv: null
 
     }),
+    computed: {
+        uniprotLink() {
+            return (this.newInfo) ? "https://www.uniprot.org/uniprot/" + this.newInfo.uniprot_id : '';
+        }
+    },
     methods: {
         loadIGVBrowser: function(igvLoc, trackRange) {
             console.log('track range: ' + trackRange);

@@ -258,9 +258,60 @@ def import_extra_genes(conn, gene_track_map):
     print('num extras found: %d' % num_extras)
 
 
+def update_crossrefs(conn):
+    lt2uniprot = {}
+    lt2string = {}
+    with open('Halo_uniprot-taxonomy_64091.csv') as infile:
+        headers = infile.readline().strip().split('\t')
+        print(list(zip(headers, range(len(headers)))))
+
+        linenum = 0
+        # every locus tag has at most one uniprot id
+        for line in infile:
+            linenum += 1
+            comps = line.strip().split('\t')
+            uniprot_id = comps[0]
+            try:
+                string_str = comps[8]
+                string_comps = [sc for sc in string_str.split(';') if len(sc) > 0]
+                #print(string_comps)
+            except IndexError:
+                continue  # skip this entry
+
+            if len(string_comps) > 1:
+                raise Exception('more than 1 STRING !!')
+
+            try:
+                locus_tag_str = comps[17]
+                if len(locus_tag_str.strip()) > 0:
+                    locus_tags = [lt.strip() for lt in locus_tag_str.split(';')]
+                    for lt in locus_tags:
+                        if not lt in lt2uniprot:
+                            lt2uniprot[lt] = uniprot_id
+                        else:
+                            raise Exception("I'm double UNIPROT !!!")
+
+                        if not lt in lt2string:
+                            lt2string[lt] = string_comps[0]
+                        else:
+                            raise Exception("I'm double STRING")
+                    #print(locus_tags)
+            except IndexError:
+                continue  # skip this entry
+
+    print(lt2string.keys())
+    with conn.cursor() as cur:
+        for lt, uniprot_id in lt2uniprot.items():
+            cur.execute('update genes set uniprot_id=%s where name=%s', [uniprot_id, lt]);
+
+        for lt, string_id in lt2string.items():
+            cur.execute('update genes set string_id=%s where name=%s', [string_id, lt]);
+        conn.commit()
+
 if __name__ == '__main__':
     gene_track_map = read_gene_tracks()
     conn = dbconn()
+    """
     import_genes(conn, gene_track_map)
     with conn.cursor() as cur:
         cur.execute('select count(*) from genes')
@@ -268,4 +319,6 @@ if __name__ == '__main__':
         print("# genes imported: ", num_genes)
     mark_extra_genes(conn)
     import_extra_genes(conn, gene_track_map)
+    """
+    update_crossrefs(conn)
     conn.close()

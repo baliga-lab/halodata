@@ -15,7 +15,7 @@
     "kinetic": "^5.2.0",
     "vue": "^2.6.14",
     "vue-axios": "^3.4.0",
-    "vue-pdf": "^4.3.0",
+    "vue-pdf-embed": "^1.1.2",
     "vue-router": "^3.5.3",
     "vuetify": "^2.4.0"
   },

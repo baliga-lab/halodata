@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import HeatMap from './components/HeatMap'
+import HeatMapStatic from './components/HeatMapStatic'
 import GeneView from './components/GeneView'
 import DataTables from './components/DataTables'
 import AboutPage from './components/AboutPage'
@@ -20,6 +21,11 @@ export default new Router({
             path: '/heatmap',
             name: 'heatmap',
             component: HeatMap
+        },
+        {
+            path: '/heatmapstatic',
+            name: 'heatmapstatic',
+            component: HeatMapStatic
         },
         {
             path: '/viewgene/:gene',

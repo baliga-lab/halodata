@@ -23,7 +23,10 @@ create table if not exists genes (
   start_pos integer,
   end_pos integer,
   strand varchar(1),
-  is_extra integer default 0
+  is_extra integer default 0,
+
+  uniprot_id varchar(50),
+  string_id varchar(50)
 );
 
 /*

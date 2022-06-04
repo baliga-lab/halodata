@@ -12,6 +12,7 @@
 
       <v-btn to="/" text>Home</v-btn>
       <v-btn to="/heatmap" text>Atlas</v-btn>
+      <v-btn to="/heatmapstatic" text>Atlas (Static)</v-btn>
       <v-btn to="/about" text>About</v-btn>
       <v-spacer></v-spacer>
 
