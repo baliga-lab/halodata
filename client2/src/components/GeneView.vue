@@ -108,8 +108,20 @@
   </v-row>
 
     <!-- IGV Browser -->
-  <v-row v-if="newInfo" style="text-align: left">
+  <v-row v-if="newInfo">
     <h3>Genome Browser</h3>
+  </v-row>
+  <v-row v-if="newInfo">
+    <v-col class="mb-4">
+    <div>
+      <v-checkbox v-model="isLogScale" @change="reloadIGVBrowser" label="Display tracks in Log Scale"></v-checkbox>
+    </div>
+    </v-col>
+  </v-row>
+  <v-row>
+    <v-col class="mb-4">
+      <div>&nbsp;</div>
+    </v-col>
   </v-row>
   <v-row v-if="newInfo">
     <div id="igv" ref="igv"></div>
@@ -201,6 +213,7 @@ export default {
     name: 'GeneView',
 
     data: () => ({
+        isLogScale: true,
         geneDoesNotExist: false,
         microarrayData: [],
         proteinStructureData: null,
@@ -242,6 +255,16 @@ export default {
 
     },
     methods: {
+        // always take the coordinates from the new info structure unless there are none
+        // WW: loading the browser too early results in the div not
+        // existing sometimes, so we wrap it in a nextTick
+        reloadIGVBrowser: function() {
+            if (this.newInfo.chrom != '') {
+                this.$nextTick(() => {
+                    this.loadIGVBrowser(this.newInfo.igv_loc, this.newInfo.track_range);
+                });
+            }
+        },
         loadIGVBrowser: function(igvLoc, trackRange) {
             console.log('track range: ' + trackRange);
             igv.removeAllBrowsers();
@@ -267,6 +290,7 @@ export default {
                         url: STATIC_URL + "split_tracks/ribosomal_RNA_TP1-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP1 (+)",
                         color: "darkgrey"
@@ -274,6 +298,7 @@ export default {
                     {
                         url: STATIC_URL + "split_tracks/ribosomal_RNA_TP2-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
+                        logScale: this.isLogScale,
                         format: "bedgraph",
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP2 (+)",
@@ -283,6 +308,7 @@ export default {
                         url: STATIC_URL + "split_tracks/ribosomal_RNA_TP3-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP3 (+)",
                         color: "darkgrey"
@@ -291,6 +317,7 @@ export default {
                         url: STATIC_URL + "split_tracks/ribosomal_RNA_TP4-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP4 (+)",
                         color: "darkgrey"
@@ -299,6 +326,7 @@ export default {
                         url: STATIC_URL + "split_tracks/total-RNA-TP1-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "tot",
                         name: "RNA-Seq TP1 (+)",
                         color: "darkgrey"
@@ -307,6 +335,7 @@ export default {
                         url: STATIC_URL + "split_tracks/total-RNA-TP2-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "tot",
                         name: "RNA-Seq TP2 (+)",
                         color: "darkgrey"
@@ -315,6 +344,7 @@ export default {
                         url: STATIC_URL + "split_tracks/total-RNA-TP3-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "tot",
                         name: "RNA-Seq TP3 (+)",
                         color: "darkgrey"
@@ -323,6 +353,7 @@ export default {
                         url: STATIC_URL + "split_tracks/total-RNA-TP4-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "tot",
                         name: "RNA-Seq TP4 (+)",
                         color: "darkgrey"
@@ -393,6 +424,7 @@ export default {
                         url: STATIC_URL + "split_tracks/ribosomal_RNA_TP1-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP1 (-)",
                         color: "darkgrey"
@@ -401,6 +433,7 @@ export default {
                         url: STATIC_URL + "split_tracks/ribosomal_RNA_TP2-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP2 (-)",
                         color: "darkgrey"
@@ -409,6 +442,7 @@ export default {
                         url: STATIC_URL + "split_tracks/ribosomal_RNA_TP3-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP3 (-)",
                         color: "darkgrey"
@@ -417,6 +451,7 @@ export default {
                         url: STATIC_URL + "split_tracks/ribosomal_RNA_TP4-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "ribo",
                         name: "Ribo-Seq TP4 (-)",
                         color: "darkgrey"
@@ -425,6 +460,7 @@ export default {
                         url: STATIC_URL + "split_tracks/total-RNA-TP1-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "tot",
                         name: "RNA-Seq TP1 (-)",
                         color: "darkgrey"
@@ -433,6 +469,7 @@ export default {
                         url: STATIC_URL + "split_tracks/total-RNA-TP2-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "tot",
                         name: "RNA-Seq TP2 (-)",
                         color: "darkgrey"
@@ -441,6 +478,7 @@ export default {
                         url: STATIC_URL + "split_tracks/total-RNA-TP3-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "tot",
                         name: "RNA-Seq TP3 (-)",
                         color: "darkgrey"
@@ -449,6 +487,7 @@ export default {
                         url: STATIC_URL + "split_tracks/total-RNA-TP4-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
+                        logScale: this.isLogScale,
                         autoscaleGroup: "tot",
                         name: "RNA-Seq TP4 (-)",
                         color: "darkgrey"
@@ -459,6 +498,7 @@ export default {
                 .then(function (browser) {
                     self.igv = browser;
                     console.log('created browser');
+                    console.log(self.igv);
             });
         }
     },
@@ -487,6 +527,7 @@ export default {
                                         var microarrayApi = BASE_URL + '/microarray_data/' + gene;
                                         var proteinStructureApi = BASE_URL + '/proteinstructure/' + gene;
 
+                                        /*
                                         // always take the coordinates from the new info structure unless there are none
                                         // WW: loading the browser too early results in the div not
                                         // existing sometimes, so we wrap it in a nextTick
@@ -494,7 +535,8 @@ export default {
                                             this.$nextTick(() => {
                                                 this.loadIGVBrowser(this.newInfo.igv_loc, this.newInfo.track_range);
                                             });
-                                        }
+                                            }*/
+                                        this.reloadIGVBrowser();
 
                                         if (!this.newInfo.is_extra) {
                                             // SBEAMS Microarray
