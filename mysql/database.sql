@@ -1,13 +1,14 @@
 drop table if exists cog;
 drop table if exists cog_categories;
 drop table if exists cog_pathways;
+drop table if exists gene_gene_ontologies;
 drop table if exists gene_locus_tags;
+drop table if exists gene_ontologies;
+drop table if exists gene_pathways;
 drop table if exists genes;
 drop table if exists insertion_sequences;
 drop table if exists locus_tags;
-/*
-drop table if exists extra_genes;
-*/
+drop table if exists pathways;
 
 create table if not exists genes (
   id integer primary key auto_increment,
@@ -26,9 +27,29 @@ create table if not exists genes (
   is_extra integer default 0,
 
   uniprot_id varchar(50),
-  string_id varchar(50)
+  string_id varchar(50),
+  pathway varchar(255)
 );
 
+create table if not exists pathways (
+  id integer primary key auto_increment,
+  name varchar(200)
+);
+
+create table if not exists gene_pathways (
+  gene_id integer not null,
+  pathway_id integer not null
+);
+
+create table if not exists gene_ontologies  (
+  id integer primary key auto_increment,
+  name varchar(100)
+);
+
+create table if not exists gene_gene_ontologies (
+  gene_id integer not null,
+  gene_ontology_id integer not null
+);
 /*
 create table if not exists extra_genes (
   id integer primary key auto_increment,

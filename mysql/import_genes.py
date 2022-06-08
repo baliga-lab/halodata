@@ -4,6 +4,8 @@ import mysql.connector
 from collections import defaultdict
 import traceback as tb
 
+import db_add_missing_locations as fix_loc
+
 def dbconn():
     return mysql.connector.connect(host="127.0.0.1", port=3306, user='root', database='halodata')
 
@@ -271,6 +273,7 @@ def update_crossrefs(conn):
             linenum += 1
             comps = line.strip().split('\t')
             uniprot_id = comps[0]
+
             try:
                 string_str = comps[8]
                 string_comps = [sc for sc in string_str.split(';') if len(sc) > 0]
@@ -308,10 +311,43 @@ def update_crossrefs(conn):
             cur.execute('update genes set string_id=%s where name=%s', [string_id, lt]);
         conn.commit()
 
+def update_crossrefs2(conn):
+    """update based on UniprotID"""
+    pathway2id = {}
+    ontology2id = {}
+    with open('Halo_uniprot-taxonomy_64091.csv') as infile:
+        infile.readline()  # skip header
+        linenum = 0
+        # every locus tag has at most one uniprot id
+        for line in infile:
+            linenum += 1
+            comps = line.strip().split('\t')
+            uniprot_id = comps[0]
+
+            # insert pathways
+            try:
+                pathway_str = comps[3]
+                pathway_comps = [pc for pc in pathway_str.split(';') if len(pc) > 0]
+                with conn.cursor() as cur:
+                    for pathway in pathway_comps:
+                        if pathway in pathway2id:
+                            pathway_id = pathway2id[pathway]
+                        else:
+                            cur.execute('insert into pathways (name) values (%s)', [pathway])
+                            pathway_id = cur.lastrowid
+                            pathway2id[pathway] = pathway_id
+                        cur.execute('select id from genes where uniprot_id=%s', [uniprot_id])
+                        row = cur.fetchone()
+                        if row is not None:
+                            gene_id = row[0]
+                            cur.execute('insert into gene_pathways (gene_id, pathway_id) values (%s,%s)', [gene_id, pathway_id])
+            except IndexError:
+                continue  # skip this entry
+    conn.commit()
+
 if __name__ == '__main__':
     gene_track_map = read_gene_tracks()
     conn = dbconn()
-    """
     import_genes(conn, gene_track_map)
     with conn.cursor() as cur:
         cur.execute('select count(*) from genes')
@@ -319,6 +355,8 @@ if __name__ == '__main__':
         print("# genes imported: ", num_genes)
     mark_extra_genes(conn)
     import_extra_genes(conn, gene_track_map)
-    """
+
     update_crossrefs(conn)
+    update_crossrefs2(conn)
+    fix_loc.fix_missing_positions(conn)
     conn.close()
