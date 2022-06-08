@@ -7,7 +7,7 @@
       dark
     >
       <div class="d-flex align-center">
-        <span style="font-size: 18pt">Halo Data Atlas&nbsp;&nbsp;&nbsp;</span>
+        <span style="font-size: 14pt; font-weight: bold"><i>H. salinarum</i> NRC-1 Atlas&nbsp;&nbsp;&nbsp;</span>
       </div>
 
       <v-btn to="/" text>Home</v-btn>
@@ -44,7 +44,7 @@
 export default {
     name: 'App',
     created() {
-        document.title = "Halo Data Atlas"
+        document.title = "H. salinarum NRC-1 Atlas"
     },
     data: () => ({
     })

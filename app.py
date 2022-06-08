@@ -99,7 +99,9 @@ def gene_info(gene):
                where g.id=%s"""
         cur.execute(q, [gene_id])
         for row in cur.fetchall():
-            if row[0].startswith('VNG') and not row[0].startswith('VNG_'):
+            if gene == 'VNG_7025':  # Hack: force VNG_7025 to map to VNG6029G instead of VNG6241G
+                entry['locus_tag'] = 'VNG6029G'
+            elif row[0].startswith('VNG') and not row[0].startswith('VNG_'):
                 entry['locus_tag'] = row[0]
     print(result)
     if len(result) == 0:

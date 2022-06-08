@@ -14,20 +14,29 @@
   <v-row  style="text-align: left" v-if="proteinStructureData">
     <h3>Annotations</h3>
   </v-row>
-  <v-row class="text-center" v-if="newInfo">
+
+  <v-row class="text-center" v-if="annotationReady">
     <v-col class="mb-4">
       <v-simple-table>
         <template v-slot:default>
           <thead>
             <tr>
+              <th class="text-left">Location</th>
+              <th class="text-left">COG ID</th>
+              <th class="text-left">Genbank ID</th>
+              <th class="text-left">Gene Symbol</th>
               <th class="text-left">Uniprot ID</th>
               <th class="text-left">STRING ID</th>
             </tr>
           </thead>
           <tbody>
             <tr>
+              <td class="text-left">{{location}}</td>
+              <td class="text-left"><a :href="cogLink" target="_blank">{{cogID}}</a></td>
+              <td class="text-left">{{genbankID}}</td>
+              <td class="text-left">{{commonName}}</td>
               <td class="text-left"><a :href="uniprotLink" target="_blank">{{newInfo.uniprot_id}}</a></td>
-              <td class="text-left">{{newInfo.string_id}}</td>
+              <td class="text-left"><a :href="stringLink" target="_blank">{{newInfo.string_id}}</a></td>
             </tr>
           </tbody>
         </template>
@@ -35,58 +44,10 @@
     </v-col>
   </v-row>
 
-  <v-row class="text-center" v-if="proteinStructureData">
-    <v-col class="mb-4">
-      <v-simple-table>
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th class="text-left">COG ID</th>
-              <th class="text-left">Genbank ID</th>
-              <th class="text-left">Gene Symbol</th>
-              <th class="text-left">Location</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="text-left"><a :href="cogLink" target="_blank">{{proteinStructureData.COG_ID}}</a></td>
-              <td class="text-left">{{proteinStructureData.Genbank_ID}}</td>
-              <td class="text-left">{{proteinStructureData.common_name}}</td>
-              <td class="text-left">{{proteinStructureData.location}}</td>
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
-    </v-col>
-  </v-row>
-
-  <!-- EXTRA GENES instead of annotation -->
-  <v-row class="text-center" v-if="newInfo && newInfo.is_extra">
-    <v-col class="mb-4">
-      <v-simple-table>
-        <template v-slot:default>
-          <thead>
-            <tr>
-              <th class="text-left">Gene Symbol</th>
-              <th class="text-left">Location</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="text-left">{{newInfo.gene_symbol}}</td>
-              <td class="text-left">{{newInfo.location}}</td>
-            </tr>
-          </tbody>
-        </template>
-      </v-simple-table>
-    </v-col>
-  </v-row>
-
-
-  <v-row  style="text-align: left" v-if="newInfo">
+  <v-row  style="text-align: left" v-if="hasCOGInfo">
     <h3>COG Information</h3>
   </v-row>
-  <v-row class="text-center" v-if="newInfo">
+  <v-row class="text-center" v-if="hasCOGInfo">
     <v-col class="mb-4">
       <v-simple-table>
         <template v-slot:default>
@@ -233,8 +194,28 @@ export default {
 
     }),
     computed: {
+        annotationReady() { return this.proteinStructureData || this.newInfo; },
+        hasCOGInfo() { return this.newInfo && (this.newInfo.cog_category || this.newInfo.cog_pathway); },
+        cogID() { return this.newInfo != null ? this.newInfo.cog_id : ''; },
+        genbankID() { return this.proteinStructureData != null ? this.proteinStructureData.Genbank_ID : '' },
+        // also gene symbol from newInfo
+        commonName() {
+            if (this.newInfo != null) { return this.newInfo.gene_symbol; }
+            return this.proteinStructureData != null ? this.proteinStructureData.common_name : ''
+        },
+        // also location from newInfo
+        location() {
+            console.log(this.newInfo);
+            if (this.newInfo != null && this.newInfo.chrom) {
+                return this.newInfo.chrom + ' ' + this.newInfo.start_pos + ' ' + this.newInfo.end_pos;
+            }
+            return this.proteinStructureData != null ? this.proteinStructureData.location : ''
+        },
         uniprotLink() {
             return (this.newInfo) ? "https://www.uniprot.org/uniprot/" + this.newInfo.uniprot_id : '';
+        },
+        stringLink() {
+            return this.newInfo ? "https://string-db.org/cgi/network?identifier=" + this.newInfo.string_id : '';
         },
         egrinLink() {
             return this.newInfo ? 'http://networks.systemsbiology.net/hal/gene/' + this.newInfo.locus_tag : '';
@@ -497,8 +478,6 @@ export default {
             igv.createBrowser(igvDiv, options)
                 .then(function (browser) {
                     self.igv = browser;
-                    console.log('created browser');
-                    console.log(self.igv);
             });
         }
     },

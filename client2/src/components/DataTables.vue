@@ -2,7 +2,7 @@
   <v-container>
     <v-row class="text-center">
       <v-col class="mb-4">
-        <h2 class="display-2 font-weight-bold mb-3">Halo Data Atlas</h2>
+        <h2 class="display-2 font-weight-bold mb-3"><i>Halobacterium salinarum</i> NRC-1 Atlas</h2>
       </v-col>
     </v-row>
     <v-row class="text-left">
