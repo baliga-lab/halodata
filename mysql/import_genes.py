@@ -328,6 +328,15 @@ def process_uniprot_field(conn, uniprot_id, comp, table_name, relation_table, id
                 gene_id = row[0]
                 cur.execute('insert into ' + relation_table + ' values (%s,%s)', [gene_id, pk])
 
+def process_uniprot_field_single(conn, uniprot_id, compstr, field):
+    compstr.strip('"')
+    comps = [value.strip() for value in compstr.split(';') if len(value) > 0]
+    if len(comps) > 1:
+        raise Execption('Too many values (more than one) in field %s' % field)
+    if len(comps) > 0:
+        with conn.cursor() as cur:
+            cur.execute('update genes set ' + field + '=%s where uniprot_id=%s', [comps[0], uniprot_id])
+
 def update_crossrefs2(conn):
     """update based on UniprotID"""
     pathway2id = {}
@@ -358,6 +367,10 @@ def update_crossrefs2(conn):
                 continue  # skip this entry
             try:
                 process_uniprot_field(conn, uniprot_id, comps[6], 'go_mol', 'gene_go_mol', gomol2id)
+            except IndexError:
+                continue  # skip this entry
+            try:
+                process_uniprot_field_single(conn, uniprot_id, comps[10], 'orthodb_id')
             except IndexError:
                 continue  # skip this entry
 

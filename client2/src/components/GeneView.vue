@@ -27,6 +27,7 @@
               <th class="text-left">Gene Symbol</th>
               <th class="text-left">Uniprot ID</th>
               <th class="text-left">STRING ID</th>
+              <th class="text-left">OrthoDB ID</th>
             </tr>
           </thead>
           <tbody>
@@ -37,11 +38,32 @@
               <td class="text-left">{{commonName}}</td>
               <td class="text-left"><a :href="uniprotLink" target="_blank">{{newInfo.uniprot_id}}</a></td>
               <td class="text-left"><a :href="stringLink" target="_blank">{{newInfo.string_id}}</a></td>
+              <td class="text-left">{{newInfo.orthodb_id}}</td>
             </tr>
           </tbody>
         </template>
       </v-simple-table>
     </v-col>
+  </v-row>
+
+  <!-- IGV Browser -->
+  <v-row v-if="newInfo">
+    <h3>Genome Browser</h3>
+  </v-row>
+  <v-row v-if="newInfo">
+    <v-col class="mb-4">
+    <div>
+      <v-checkbox v-model="isLogScale" @change="reloadIGVBrowser" label="Display tracks in Log Scale"></v-checkbox>
+    </div>
+    </v-col>
+  </v-row>
+  <v-row>
+    <v-col class="mb-4">
+      <div>&nbsp;</div>
+    </v-col>
+  </v-row>
+  <v-row v-if="newInfo">
+    <div id="igv" ref="igv"></div>
   </v-row>
 
   <v-row  style="text-align: left" v-if="hasCOGInfo">
@@ -68,24 +90,46 @@
     </v-col>
   </v-row>
 
-    <!-- IGV Browser -->
-  <v-row v-if="newInfo">
-    <h3>Genome Browser</h3>
+  <v-row  style="text-align: left" v-if="hasPathway">
+    <h3>Pathway Information</h3>
   </v-row>
-  <v-row v-if="newInfo">
+  <v-row  style="text-align: left" v-if="hasPathway">
     <v-col class="mb-4">
-    <div>
-      <v-checkbox v-model="isLogScale" @change="reloadIGVBrowser" label="Display tracks in Log Scale"></v-checkbox>
-    </div>
+      <ul>
+        <li v-for="p in newInfo.pathways" :key="p">{{p}}</li>
+      </ul>
     </v-col>
   </v-row>
-  <v-row>
+
+  <v-row  style="text-align: left" v-if="hasGOBio">
+    <h3>Gene ontology (biological process)</h3>
+  </v-row>
+  <v-row  style="text-align: left" v-if="hasGOBio">
     <v-col class="mb-4">
-      <div>&nbsp;</div>
+      <ul>
+        <li v-for="go in newInfo.go_bio" :key="go">{{go}}</li>
+      </ul>
     </v-col>
   </v-row>
-  <v-row v-if="newInfo">
-    <div id="igv" ref="igv"></div>
+  <v-row  style="text-align: left" v-if="hasGOCell">
+    <h3>Gene ontology (cellular component)</h3>
+  </v-row>
+  <v-row  style="text-align: left" v-if="hasGOCell">
+    <v-col class="mb-4">
+      <ul>
+        <li v-for="go in newInfo.go_cell" :key="go">{{go}}</li>
+      </ul>
+    </v-col>
+  </v-row>
+  <v-row  style="text-align: left" v-if="hasGOMol">
+    <h3>Gene ontology (molecular function)</h3>
+  </v-row>
+  <v-row  style="text-align: left" v-if="hasGOMol">
+    <v-col class="mb-4">
+      <ul>
+        <li v-for="go in newInfo.go_mol" :key="go">{{go}}</li>
+      </ul>
+    </v-col>
   </v-row>
 
   <!-- Proceinstructure data -->
@@ -198,6 +242,10 @@ export default {
         hasCOGInfo() { return this.newInfo && (this.newInfo.cog_category || this.newInfo.cog_pathway); },
         cogID() { return this.newInfo != null ? this.newInfo.cog_id : ''; },
         genbankID() { return this.proteinStructureData != null ? this.proteinStructureData.Genbank_ID : '' },
+        hasPathway() { return this.newInfo && this.newInfo.pathways.length > 0},
+        hasGOBio() { return this.newInfo && this.newInfo.go_bio.length > 0 },
+        hasGOCell() { return this.newInfo && this.newInfo.go_cell.length > 0 },
+        hasGOMol() { return this.newInfo && this.newInfo.go_mol.length > 0 },
         // also gene symbol from newInfo
         commonName() {
             if (this.newInfo != null) { return this.newInfo.gene_symbol; }

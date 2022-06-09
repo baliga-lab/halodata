@@ -67,7 +67,7 @@ def gene_info(gene):
         range_buckets = make_range_buckets()
         query = """select
                      g.name,g.gene_symbol,g.is_extra,g.product,g.chrom,g.start_pos,g.end_pos,
-                     g.uniprot_id,g.string_id,
+                     g.uniprot_id,g.string_id,g.orthodb_id,
                      c.name as cog_id,cc.name as cog_category,cp.name as cog_pathway,
                      ins.name as ins_name,ins.family as ins_family,ins.subgroup as ins_subgroup
                    from genes g
@@ -77,14 +77,14 @@ def gene_info(gene):
                      left outer join insertion_sequences ins on g.is_id=ins.id
                    where g.id=%s"""
         cur.execute(query, [gene_id])
-        for gene,gene_symbol,is_extra,product,chrom,start_pos,end_pos,uniprot_id,string_id,cog_id,ccat,cpathway,ins_name,ins_family,ins_subgroup in cur.fetchall():
+        for gene,gene_symbol,is_extra,product,chrom,start_pos,end_pos,uniprot_id,string_id,orthodb_id,cog_id,ccat,cpathway,ins_name,ins_family,ins_subgroup in cur.fetchall():
             igv_loc = make_igv_loc(chrom, start_pos, end_pos)
             track_range = make_track_range(range_buckets, chrom, start_pos, end_pos)
             entry = {'is_extra': is_extra, 'gene': gene, 'gene_symbol': gene_symbol,
                      'cog_id': cog_id, 'cog_category': ccat, 'chrom': chrom,
                      'start_pos': start_pos, 'end_pos': end_pos, 'product': product,
                      'igv_loc': igv_loc, 'track_range': track_range,
-                     'string_id': string_id, 'uniprot_id': uniprot_id}
+                     'string_id': string_id, 'uniprot_id': uniprot_id, 'orthodb_id': orthodb_id}
 
             # attach additional information
             print(entry)
@@ -103,6 +103,38 @@ def gene_info(gene):
                 entry['locus_tag'] = 'VNG6029G'
             elif row[0].startswith('VNG') and not row[0].startswith('VNG_'):
                 entry['locus_tag'] = row[0]
+
+        # pathways
+        q = """select p.name from pathways p join gene_pathways gp on gp.pathway_id=p.id where gp.gene_id=%s"""
+        cur.execute(q, [gene_id])
+        pathways = []
+        for row in cur.fetchall():
+            pathways.append(row[0].replace('PATHWAY: ', ''))
+        entry['pathways'] = pathways
+
+        # go_bio
+        q = """select gb.name from go_bio gb join gene_go_bio ggb on ggb.ontology_id=gb.id where ggb.gene_id=%s"""
+        cur.execute(q, [gene_id])
+        go_terms = []
+        for row in cur.fetchall():
+            go_terms.append(row[0])
+        entry['go_bio'] = go_terms
+        # go_cell
+        q = """select gc.name from go_cell gc join gene_go_cell ggc on ggc.ontology_id=gc.id where ggc.gene_id=%s"""
+        cur.execute(q, [gene_id])
+        go_terms = []
+        for row in cur.fetchall():
+            go_terms.append(row[0])
+        entry['go_cell'] = go_terms
+
+        # go_mol
+        q = """select gm.name from go_mol gm join gene_go_mol ggm on ggm.ontology_id=gm.id where ggm.gene_id=%s"""
+        cur.execute(q, [gene_id])
+        go_terms = []
+        for row in cur.fetchall():
+            go_terms.append(row[0])
+        entry['go_mol'] = go_terms
+
     print(result)
     if len(result) == 0:
         abort(404)
