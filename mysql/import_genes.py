@@ -311,10 +311,29 @@ def update_crossrefs(conn):
             cur.execute('update genes set string_id=%s where name=%s', [string_id, lt]);
         conn.commit()
 
+def process_uniprot_field(conn, uniprot_id, comp, table_name, relation_table, idmap):
+    comp = comp.strip('"')
+    values = [value.strip() for value in comp.split(';') if len(value) > 0]
+    with conn.cursor() as cur:
+        for value in values:
+            if value in idmap:
+                pk = idmap[value]
+            else:
+                cur.execute('insert into ' + table_name + ' (name) values (%s)', [value])
+                pk = cur.lastrowid
+                idmap[value] = pk
+            cur.execute('select id from genes where uniprot_id=%s', [uniprot_id])
+            row = cur.fetchone()
+            if row is not None:
+                gene_id = row[0]
+                cur.execute('insert into ' + relation_table + ' values (%s,%s)', [gene_id, pk])
+
 def update_crossrefs2(conn):
     """update based on UniprotID"""
     pathway2id = {}
-    ontology2id = {}
+    gobio2id = {}
+    gocell2id = {}
+    gomol2id = {}
     with open('Halo_uniprot-taxonomy_64091.csv') as infile:
         infile.readline()  # skip header
         linenum = 0
@@ -326,23 +345,22 @@ def update_crossrefs2(conn):
 
             # insert pathways
             try:
-                pathway_str = comps[3]
-                pathway_comps = [pc for pc in pathway_str.split(';') if len(pc) > 0]
-                with conn.cursor() as cur:
-                    for pathway in pathway_comps:
-                        if pathway in pathway2id:
-                            pathway_id = pathway2id[pathway]
-                        else:
-                            cur.execute('insert into pathways (name) values (%s)', [pathway])
-                            pathway_id = cur.lastrowid
-                            pathway2id[pathway] = pathway_id
-                        cur.execute('select id from genes where uniprot_id=%s', [uniprot_id])
-                        row = cur.fetchone()
-                        if row is not None:
-                            gene_id = row[0]
-                            cur.execute('insert into gene_pathways (gene_id, pathway_id) values (%s,%s)', [gene_id, pathway_id])
+                process_uniprot_field(conn, uniprot_id, comps[3], 'pathways', 'gene_pathways', pathway2id)
             except IndexError:
                 continue  # skip this entry
+            try:
+                process_uniprot_field(conn, uniprot_id, comps[4], 'go_bio', 'gene_go_bio', gobio2id)
+            except IndexError:
+                continue  # skip this entry
+            try:
+                process_uniprot_field(conn, uniprot_id, comps[5], 'go_cell', 'gene_go_cell', gocell2id)
+            except IndexError:
+                continue  # skip this entry
+            try:
+                process_uniprot_field(conn, uniprot_id, comps[6], 'go_mol', 'gene_go_mol', gomol2id)
+            except IndexError:
+                continue  # skip this entry
+
     conn.commit()
 
 if __name__ == '__main__':
