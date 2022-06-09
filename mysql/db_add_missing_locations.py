@@ -35,9 +35,9 @@ def fix_missing_positions(conn):
                     old_chrom = row[0]
                     if old_chrom is None or old_chrom == '':
                         print("%s -> %s %s-%s" % (final_gene_name, chrom, start, stop))
-                        #cur.execute('update genes set chrom=%s, start_pos=%s, end_pos=%s where name=%s',
-                        #            [chrom, start, stop, final_gene_name])
-                #conn.commit()
+                        cur.execute('update genes set chrom=%s, start_pos=%s, end_pos=%s where name=%s',
+                                    [chrom, start, stop, final_gene_name])
+                conn.commit()
 
 if __name__ == '__main__':
     conn = mysql.connector.connect(host="127.0.0.1", port=3306, user='root',
