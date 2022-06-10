@@ -11,7 +11,7 @@ export default {
     name: 'HeatMap',
 
     data: () => ({
-        heatmapURL: 'https://parlak.systemsbiology.net/haloheatmap2/'
+        heatmapURL: 'https://parlak.systemsbiology.net/haloheatmap/'
     })
   }
 </script>
