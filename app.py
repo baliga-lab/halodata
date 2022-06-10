@@ -136,6 +136,13 @@ def gene_info(gene):
         entry['go_mol'] = go_terms
 
         ## CROSS REFS
+        q = """select up.name from uni_pathways up join gene_uni_pathways gup on gup.pathway_id=up.id where gup.gene_id=%s"""
+        cur.execute(q, [gene_id])
+        cross_refs = []
+        for row in cur.fetchall():
+            cross_refs.append(row[0])
+        entry['uni_pathway'] = cross_refs
+
         q = """select cdd.name from cdd_refs cdd join gene_cdd_refs gcdd on gcdd.cdd_ref_id=cdd.id where gcdd.gene_id=%s"""
         cur.execute(q, [gene_id])
         cross_refs = []

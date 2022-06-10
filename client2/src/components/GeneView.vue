@@ -25,9 +25,6 @@
               <th class="text-left">COG ID</th>
               <th class="text-left">Genbank ID</th>
               <th class="text-left">Gene Symbol</th>
-              <th class="text-left">Uniprot ID</th>
-              <th class="text-left">STRING ID</th>
-              <th class="text-left">OrthoDB ID</th>
             </tr>
           </thead>
           <tbody>
@@ -36,9 +33,6 @@
               <td class="text-left"><a :href="cogLink" target="_blank">{{cogID}}</a></td>
               <td class="text-left">{{genbankID}}</td>
               <td class="text-left">{{commonName}}</td>
-              <td class="text-left"><a :href="uniprotLink" target="_blank">{{newInfo.uniprot_id}}</a></td>
-              <td class="text-left"><a :href="stringLink" target="_blank">{{newInfo.string_id}}</a></td>
-              <td class="text-left">{{newInfo.orthodb_id}}</td>
             </tr>
           </tbody>
         </template>
@@ -131,6 +125,64 @@
       </ul>
     </v-col>
   </v-row>
+
+  <!-- Cross references -->
+  <v-row class="text-center" v-if="hasCrossReferences">
+    <h3>Cross References</h3>
+  </v-row>
+  <v-row class="text-center" v-if="hasCrossReferences">
+    <v-col class="mb-4">
+      <v-simple-table>
+        <template v-slot:default>
+          <thead>
+            <tr>
+              <th class="text-left">Database</th>
+              <th class="text-left">References</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="hasUniprot">
+              <td class="text-left">Uniprot</td>
+              <td class="text-left"><a :href="uniprotLink" target="_blank">{{newInfo.uniprot_id}}</a></td>
+            </tr>
+            <tr v-if="hasSTRING">
+              <td class="text-left">STRING</td>
+              <td class="text-left"><a :href="stringLink" target="_blank">{{newInfo.string_id}}</a></td>
+            </tr>
+            <tr v-if="hasCDD">
+              <td class="text-left">CDD</td>
+              <td class="text-left"><span v-for="cdd in newInfo.cdd" :key="cdd">{{cdd}}&nbsp;</span></td>
+            </tr>
+            <tr v-if="hasProsite">
+              <td class="text-left">Prosite</td>
+              <td class="text-left"><span v-for="prosite in newInfo.prosite" :key="prosite">{{prosite}}&nbsp;</span></td>
+            </tr>
+            <tr v-if="hasSMART">
+              <td class="text-left">SMART</td>
+              <td class="text-left"><span v-for="smart in newInfo.smart" :key="smart">{{smart}}&nbsp;</span></td>
+            </tr>
+            <tr v-if="hasPFAM">
+              <td class="text-left">Pfam</td>
+              <td class="text-left"><span v-for="pfam in newInfo.pfam" :key="pfam"><a :href="pfamLink(pfam)" target="_blank">{{pfam}}</a>&nbsp;</span></td>
+            </tr>
+            <tr v-if="hasUniPathway">
+              <td class="text-left">UniPathway</td>
+              <td class="text-left"><span v-for="uni in newInfo.uni_pathway" :key="uni">{{uni}}&nbsp;</span></td>
+            </tr>
+            <tr v-if="hasInterpro">
+              <td class="text-left">Interpro</td>
+              <td class="text-left"><span v-for="inter in newInfo.interpro" :key="inter">{{inter}}&nbsp;</span></td>
+            </tr>
+            <tr v-if="hasOrthoDB">
+              <td class="text-left">OrthoDB</td>
+              <td class="text-left">{{newInfo.orthodb_id}}</td>
+            </tr>
+          </tbody>
+        </template>
+      </v-simple-table>
+    </v-col>
+  </v-row>
+
 
   <!-- Proceinstructure data -->
 
@@ -246,6 +298,22 @@ export default {
         hasGOBio() { return this.newInfo && this.newInfo.go_bio.length > 0 },
         hasGOCell() { return this.newInfo && this.newInfo.go_cell.length > 0 },
         hasGOMol() { return this.newInfo && this.newInfo.go_mol.length > 0 },
+        // TODO: include unipathway
+        hasCrossReferences() {
+            return this.newInfo && (this.newInfo.cdd.length > 0 || this.newInfo.prosite.length > 0
+                                    || this.newInfo.smart.length > 0 || this.newInfo.pfam.length > 0
+                                    || this.newInfo.uni_pathway.length > 0 || this.newInfo.interpro.length > 0
+                                    || this.newInfo.orthodb_id || this.newInfo.uniprot_id || this.newInfo.string_id);
+        },
+        hasUniprot() { return this.newInfo && this.newInfo.uniprot_id; },
+        hasSTRING() { return this.newInfo && this.newInfo.string_id },
+        hasCDD() { return this.newInfo && this.newInfo.cdd.length > 0; },
+        hasProsite() { return this.newInfo && this.newInfo.prosite.length > 0; },
+        hasSMART() { return this.newInfo && this.newInfo.smart.length > 0; },
+        hasPFAM() { return this.newInfo && this.newInfo.pfam.length > 0; },
+        hasUniPathway() { return this.newInfo && this.newInfo.uni_pathway.length > 0; },
+        hasInterpro() { return this.newInfo && this.newInfo.interpro.length > 0; },
+        hasOrthoDB() { return this.newInfo && this.newInfo.orthodb_id; },
         // also gene symbol from newInfo
         commonName() {
             if (this.newInfo != null) { return this.newInfo.gene_symbol; }
@@ -281,9 +349,9 @@ export default {
             return this.newInfo ? 'http://networks.systemsbiology.net/projects/halo/transcript_structure/' +
                 this.newInfo.locus_tag + '.pdf' : '';
         }
-
     },
     methods: {
+        pfamLink: function(pfamId) { return "https://pfam.xfam.org/family/" + pfamId; },
         // always take the coordinates from the new info structure unless there are none
         // WW: loading the browser too early results in the div not
         // existing sometimes, so we wrap it in a nextTick
