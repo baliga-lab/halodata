@@ -343,6 +343,13 @@ def update_crossrefs2(conn):
     gobio2id = {}
     gocell2id = {}
     gomol2id = {}
+    unipathway2id = {}
+    cdd2id = {}
+    prosite2id = {}
+    smart2id = {}
+    pfam2id = {}
+    interpro2id = {}
+
     with open('Halo_uniprot-taxonomy_64091.csv') as infile:
         infile.readline()  # skip header
         linenum = 0
@@ -371,6 +378,30 @@ def update_crossrefs2(conn):
                 continue  # skip this entry
             try:
                 process_uniprot_field_single(conn, uniprot_id, comps[10], 'orthodb_id')
+            except IndexError:
+                continue  # skip this entry
+            try:
+                process_uniprot_field(conn, uniprot_id, comps[11], 'uni_pathways', 'gene_uni_pathways', unipathway2id)
+            except IndexError:
+                continue  # skip this entry
+            try:
+                process_uniprot_field(conn, uniprot_id, comps[12], 'cdd_refs', 'gene_cdd_refs', cdd2id)
+            except IndexError:
+                continue  # skip this entry
+            try:
+                process_uniprot_field(conn, uniprot_id, comps[13], 'prosite_refs', 'gene_prosite_refs', prosite2id)
+            except IndexError:
+                continue  # skip this entry
+            try:
+                process_uniprot_field(conn, uniprot_id, comps[14], 'smart_refs', 'gene_smart_refs', smart2id)
+            except IndexError:
+                continue  # skip this entry
+            try:
+                process_uniprot_field(conn, uniprot_id, comps[15], 'pfam_refs', 'gene_pfam_refs', pfam2id)
+            except IndexError:
+                continue  # skip this entry
+            try:
+                process_uniprot_field(conn, uniprot_id, comps[16], 'interpro_refs', 'gene_interpro_refs', interpro2id)
             except IndexError:
                 continue  # skip this entry
 

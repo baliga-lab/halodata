@@ -135,6 +135,42 @@ def gene_info(gene):
             go_terms.append(row[0])
         entry['go_mol'] = go_terms
 
+        ## CROSS REFS
+        q = """select cdd.name from cdd_refs cdd join gene_cdd_refs gcdd on gcdd.cdd_ref_id=cdd.id where gcdd.gene_id=%s"""
+        cur.execute(q, [gene_id])
+        cross_refs = []
+        for row in cur.fetchall():
+            cross_refs.append(row[0])
+        entry['cdd'] = cross_refs
+
+        q = """select ps.name from prosite_refs ps join gene_prosite_refs gps on gps.prosite_ref_id=ps.id where gps.gene_id=%s"""
+        cur.execute(q, [gene_id])
+        cross_refs = []
+        for row in cur.fetchall():
+            cross_refs.append(row[0])
+        entry['prosite'] = cross_refs
+
+        q = """select sm.name from smart_refs sm join gene_smart_refs gsm on gsm.smart_ref_id=sm.id where gsm.gene_id=%s"""
+        cur.execute(q, [gene_id])
+        cross_refs = []
+        for row in cur.fetchall():
+            cross_refs.append(row[0])
+        entry['smart'] = cross_refs
+
+        q = """select pf.name from pfam_refs pf join gene_pfam_refs gpf on gpf.pfam_ref_id=pf.id where gpf.gene_id=%s"""
+        cur.execute(q, [gene_id])
+        cross_refs = []
+        for row in cur.fetchall():
+            cross_refs.append(row[0])
+        entry['pfam'] = cross_refs
+
+        q = """select ip.name from interpro_refs ip join gene_interpro_refs gip on gip.interpro_ref_id=ip.id where gip.gene_id=%s"""
+        cur.execute(q, [gene_id])
+        cross_refs = []
+        for row in cur.fetchall():
+            cross_refs.append(row[0])
+        entry['interpro'] = cross_refs
+
     print(result)
     if len(result) == 0:
         abort(404)

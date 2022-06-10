@@ -1,18 +1,31 @@
+drop table if exists cdds;
 drop table if exists cog;
 drop table if exists cog_categories;
 drop table if exists cog_pathways;
+drop table if exists gene_cdds;
 drop table if exists gene_go_bio;
 drop table if exists gene_go_cell;
+drop table if exists gene_interpro_refs;
 drop table if exists gene_go_mol;
 drop table if exists gene_locus_tags;
 drop table if exists go_bio;
 drop table if exists go_cell;
 drop table if exists go_mol;
 drop table if exists gene_pathways;
+drop table if exists gene_pfam_refs;
+drop table if exists gene_prosite_refs;
+drop table if exists gene_smart_refs;
+drop table if exists gene_uni_pathways;
 drop table if exists genes;
+drop table if exists interpro_refs;
 drop table if exists insertion_sequences;
 drop table if exists locus_tags;
 drop table if exists pathways;
+drop table if exists pfam_refs;
+drop table if exists prosite_refs;
+drop table if exists smart_refs;
+drop table if exists uni_pathways;
+
 
 create table if not exists genes (
   id integer primary key auto_increment,
@@ -35,12 +48,72 @@ create table if not exists genes (
   orthodb_id varchar(50)
 );
 
+create table if not exists interpro_refs (
+  id integer primary key auto_increment,
+  name varchar(200)
+);
+
+create table if not exists gene_interpro_refs (
+  gene_id integer not null,
+  interpro_ref_id integer not null
+);
+
+create table if not exists pfam_refs (
+  id integer primary key auto_increment,
+  name varchar(200)
+);
+
+create table if not exists gene_pfam_refs (
+  gene_id integer not null,
+  pfam_ref_id integer not null
+);
+
+create table if not exists prosite_refs (
+  id integer primary key auto_increment,
+  name varchar(200)
+);
+
+create table if not exists gene_prosite_refs (
+  gene_id integer not null,
+  prosite_ref_id integer not null
+);
+
+create table if not exists smart_refs (
+  id integer primary key auto_increment,
+  name varchar(200)
+);
+
+create table if not exists gene_smart_refs (
+  gene_id integer not null,
+  smart_ref_id integer not null
+);
+
+create table if not exists cdd_refs (
+  id integer primary key auto_increment,
+  name varchar(200)
+);
+
+create table if not exists gene_cdd_refs (
+  gene_id integer not null,
+  cdd_ref_id integer not null
+);
+
 create table if not exists pathways (
   id integer primary key auto_increment,
   name varchar(200)
 );
 
 create table if not exists gene_pathways (
+  gene_id integer not null,
+  pathway_id integer not null
+);
+
+create table if not exists uni_pathways (
+  id integer primary key auto_increment,
+  name varchar(200)
+);
+
+create table if not exists gene_uni_pathways (
   gene_id integer not null,
   pathway_id integer not null
 );
