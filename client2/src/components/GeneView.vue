@@ -1,5 +1,9 @@
 <template>
 <v-container>
+  <v-overlay :value="overlay">
+    <div style="text-align: center; font-size: 20pt">Please wait for tracks to load...</div>
+    <v-progress-circular indeterminate size="64"></v-progress-circular>
+  </v-overlay>
   <v-spacer style="height: 32pt"></v-spacer>
   <v-row v-if="geneDoesNotExist">
     <v-col class="mb-4">
@@ -155,27 +159,28 @@
             </tr>
             <tr v-if="hasProsite">
               <td class="text-left">Prosite</td>
-              <td class="text-left"><span v-for="prosite in newInfo.prosite" :key="prosite">{{prosite}}&nbsp;</span></td>
+              <td class="text-left"><span v-for="prosite in newInfo.prosite" :key="prosite"><a :href="prositeLink(prosite)" target="_blank">{{prosite}}</a>&nbsp;</span></td>
             </tr>
             <tr v-if="hasSMART">
               <td class="text-left">SMART</td>
-              <td class="text-left"><span v-for="smart in newInfo.smart" :key="smart">{{smart}}&nbsp;</span></td>
+              <td class="text-left"><span v-for="smart in newInfo.smart" :key="smart"><a :href="smartLink(smart)" target="_blank">{{smart}}</a>&nbsp;</span></td>
             </tr>
             <tr v-if="hasPFAM">
               <td class="text-left">Pfam</td>
               <td class="text-left"><span v-for="pfam in newInfo.pfam" :key="pfam"><a :href="pfamLink(pfam)" target="_blank">{{pfam}}</a>&nbsp;</span></td>
             </tr>
+            <!-- UniPathway is abandoned -->
             <tr v-if="hasUniPathway">
               <td class="text-left">UniPathway</td>
               <td class="text-left"><span v-for="uni in newInfo.uni_pathway" :key="uni">{{uni}}&nbsp;</span></td>
             </tr>
             <tr v-if="hasInterpro">
               <td class="text-left">Interpro</td>
-              <td class="text-left"><span v-for="inter in newInfo.interpro" :key="inter">{{inter}}&nbsp;</span></td>
+              <td class="text-left"><span v-for="inter in newInfo.interpro" :key="inter"><a :href="interproLink(inter)" target="_blank">{{inter}}</a>&nbsp;</span></td>
             </tr>
             <tr v-if="hasOrthoDB">
               <td class="text-left">OrthoDB</td>
-              <td class="text-left">{{newInfo.orthodb_id}}</td>
+              <td class="text-left"><a :href="orthodbLink(newInfo.orthodb_id)" target="_blank">{{newInfo.orthodb_id}}</a></td>
             </tr>
           </tbody>
         </template>
@@ -270,6 +275,7 @@ export default {
     name: 'GeneView',
 
     data: () => ({
+        overlay: false,
         isLogScale: true,
         geneDoesNotExist: false,
         microarrayData: [],
@@ -352,6 +358,13 @@ export default {
     },
     methods: {
         pfamLink: function(pfamId) { return "https://pfam.xfam.org/family/" + pfamId; },
+        interproLink: function(ipId) { return "https://www.ebi.ac.uk/interpro/entry/InterPro/" + ipId + "/"; },
+        orthodbLink: function(orthoDbId) { return "https://www.orthodb.org/?query=" + orthoDbId; },
+        // CDD needs to do a post action !!! TODO
+        cddLink: function(cddId) { return "https://www.ncbi.nlm.nih.gov/cdd/" + cddId; },
+        prositeLink: function(prositeId) { return "https://prosite.expasy.org/" + prositeId; },
+        smartLink: function(smartId) { return "http://smart.embl-heidelberg.de/smart/do_annotation.pl?BLAST=DUMMY&DOMAIN=" + smartId; },
+
         // always take the coordinates from the new info structure unless there are none
         // WW: loading the browser too early results in the div not
         // existing sometimes, so we wrap it in a nextTick
@@ -594,6 +607,7 @@ export default {
             igv.createBrowser(igvDiv, options)
                 .then(function (browser) {
                     self.igv = browser;
+                    self.overlay = false;
             });
         }
     },
@@ -601,6 +615,7 @@ export default {
         var gene = this.$route.params.gene;
         var newInfoApi = BASE_URL + '/gene_info/' + gene;
         var self = this;
+        this.overlay = true;
         fetch(newInfoApi)
             .then((response) => { return response.json();
                                 }).then((result) => {
@@ -661,7 +676,7 @@ export default {
                                     }
                                 }).catch(function() {
                                     self.geneDoesNotExist = true;
-                                    console.log('gene not found');
+                                    self.overlay = false;
                                 });
     },
 
