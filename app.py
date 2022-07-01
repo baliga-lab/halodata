@@ -364,15 +364,18 @@ def _old_name_from_locus_tags(locus_tags):
 def locus_tag_entries():
     conn = mysql_conn()
     cursor = conn.cursor()
-    #cursor.execute('select name,product,old_name from genes order by name')
-    cursor.execute('select g.name,g.product,group_concat(lt.name) from genes g join gene_locus_tags glt on g.id=glt.gene_id join locus_tags lt on glt.locus_tag_id=lt.id group by g.name order by g.name')
+    cursor.execute('select g.name,g.gene_symbol,g.product,group_concat(lt.name) from genes g join gene_locus_tags glt on g.id=glt.gene_id join locus_tags lt on glt.locus_tag_id=lt.id group by g.name order by g.name')
 
     result = []
-    for name, product, locus_tags in cursor.fetchall():
+    for name, gene_symbol, product, locus_tags in cursor.fetchall():
         old_name = _old_name_from_locus_tags(locus_tags)
         locus_tags = locus_tags.split(',')
+        if gene_symbol != name:
+            common_name = gene_symbol
+        else:
+            common_name = ''
         result.append({'representative': name, 'old_name': old_name, 'product': product,
-                       'locus_tag': locus_tags})
+                       'locus_tag': locus_tags, 'common_name': common_name})
 
     return jsonify(entries=result, num_entries=len(result))
 

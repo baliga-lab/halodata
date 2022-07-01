@@ -39,6 +39,7 @@
               <template v-slot:item="{item}">
                 <tr>
                   <td style="text-align: left"><router-link :to="{name: 'viewgene', params: {gene: item.representative}}">{{item.representative}}</router-link></td>
+                  <td >{{item.common_name}}</td>
                   <td >{{item.product}}</td>
                   <td><span style="margin-right: 3pt" v-for="locus_tag in item.locus_tag" :key="locus_tag"><span v-if="isInternalGene(locus_tag)"><router-link :to="{name: 'viewgene', params: {gene: locus_tag}}">{{locus_tag}}</router-link></span><span v-else>{{locus_tag}}</span></span></td>
                 </tr>
@@ -133,14 +134,15 @@ export default {
         locusTagData: [],
         cogLink: '',
         ltHeaders: [
-          {text: 'Representative', value: 'representative'},
+          {text: 'ORF', value: 'representative'},
+          {text: 'Symbol', value: 'common_name'},
           {text: 'Product', value: 'product'},
           {text: 'Locus Tag', value: 'locus_tag'}
         ],
         cogSearch: '',
         cogData: [],
         cogHeaders: [
-          {text: 'Representative', value: 'representative'},
+          {text: 'ORF', value: 'representative'},
           {text: 'COG ID', value: 'cog_id'},
           {text: 'COG Name', value: 'cog_name'},
           {text: 'COG Category', value: 'cog_category'},
@@ -149,7 +151,7 @@ export default {
         isSearch: '',
         isData: [],
         isHeaders: [
-          {text: 'Representative', value: 'representative'},
+          {text: 'ORF', value: 'representative'},
           {text: 'IS Name', value: 'is_name'},
           {text: 'IS Family', value: 'is_family'},
           {text: 'IS Subgroup', value: 'is_subgroup'}
