@@ -1,13 +1,17 @@
 import Vue from 'vue'
+import VueMobileDetection from "vue-mobile-detection"
 import App from './App.vue'
 import vuetify from './plugins/vuetify'
 import router from './router'
-//import igv from 'igv'
+
 
 Vue.config.productionTip = false
+Vue.use(VueMobileDetection);
 
-new Vue({
+var app = new Vue({
     router,
     vuetify,
     render: h => h(App)
-}).$mount('#app')
+});
+
+app.$mount('#app')

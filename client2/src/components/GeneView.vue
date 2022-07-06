@@ -1,7 +1,7 @@
 <template>
 <v-container>
   <v-overlay :value="overlay">
-    <div style="text-align: center; font-size: 20pt">Please wait for tracks to load...</div>
+    <div style="text-align: center; font-size: 20pt">Loading... Please wait.</div>
     <v-progress-circular indeterminate size="64"></v-progress-circular>
   </v-overlay>
   <v-spacer style="height: 32pt"></v-spacer>
@@ -13,6 +13,10 @@
   <v-row v-if="newInfo">
     <span style="font-size: 16pt"><b>{{newInfo.gene}}</b> {{altGeneDesc}}</span>&nbsp;
     <span v-if="proteinStructureData" style="font-size: 16pt; vertical-align: bottom">{{newInfo.product}}</span>
+  </v-row>
+  <v-row  style="text-align: left">
+    <h3  v-if="$isMobile()">MOBILE</h3>
+    <h3  v-else>JUST WEB</h3>
   </v-row>
   <v-spacer style="height: 48pt"></v-spacer>
   <v-row  style="text-align: left" v-if="proteinStructureData">
