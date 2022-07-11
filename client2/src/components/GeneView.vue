@@ -642,15 +642,9 @@ export default {
                                         var microarrayApi = BASE_URL + '/microarray_data/' + gene;
                                         var proteinStructureApi = BASE_URL + '/proteinstructure/' + gene;
 
-                                        /*
                                         // always take the coordinates from the new info structure unless there are none
                                         // WW: loading the browser too early results in the div not
                                         // existing sometimes, so we wrap it in a nextTick
-                                        if (this.newInfo.chrom != '') {
-                                            this.$nextTick(() => {
-                                                this.loadIGVBrowser(this.newInfo.igv_loc, this.newInfo.track_range);
-                                            });
-                                            }*/
                                         this.reloadIGVBrowser();
 
                                         if (!this.newInfo.is_extra) {

@@ -26,6 +26,17 @@ drop table if exists prosite_refs;
 drop table if exists smart_refs;
 drop table if exists uni_pathways;
 
+drop table if exists cdd_refs;
+drop table if exists gene_cdd_refs;
+drop table if exists gene_gene_ontologies;
+drop table if exists gene_gene_ontologies_bio;
+drop table if exists gene_gene_ontologies_cell;
+drop table if exists gene_gene_ontologies_mol;
+drop table if exists gene_ontologies;
+drop table if exists gene_ontologies_bio;
+drop table if exists gene_ontologies_cell;
+drop table if exists gene_ontologies_mol;
+
 
 create table if not exists genes (
   id integer primary key auto_increment,

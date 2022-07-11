@@ -123,7 +123,9 @@ def import_cog_data(conn, cog_map):
 def import_genes(conn, gene_info_map):
     synonyms = read_synonyms()
     seqs = read_sequences()
-    cog_map, gene2cog, symbol_map = read_cog_data()
+    symbol_map1 = read_symbolmap()
+    cog_map, gene2cog, symbol_map2 = read_cog_data()
+    final_symbol_map = merge_symbol_maps(symbol_map1, symbol_map2)
     is_map, gene2is = read_is_info()
     locus_tag_map = {}
 
@@ -150,12 +152,14 @@ def import_genes(conn, gene_info_map):
             product = synonyms[gene]['product']
             locus_tags = synonyms[gene]['locus_tags']
             try:
+                gene_symbol = final_symbol_map[gene]
+                """
                 gene_symbols = set(symbol_map[gene])
                 if len(gene_symbols) > 1:
                     print('more than one symbol for %s' % gene)
                     print(gene_symbols)
-                gene_symbol = list(gene_symbols)[0]
-            except:
+                gene_symbol = list(gene_symbols)[0]"""
+            except KeyError:
                 gene_symbol = None
 
             if gene in gene2cog:
@@ -260,9 +264,36 @@ def import_extra_genes(conn, gene_track_map):
     print('num extras found: %d' % num_extras)
 
 
+def read_symbolmap():
+    symbol_map = {}
+    with open('Halo_uniprot-taxonomy_64091.csv') as infile:
+        # The gene names fiield has EVERYTHING !!!!
+        header = infile.readline()
+        for line in infile:
+            comps = line.strip().split('\t')
+            try:
+                gene_names = comps[2]
+                #print(gene_names)
+                gcomps = gene_names.strip().split()
+                locus_tag = None
+                symbol = None
+                #print(gcomps)
+                for comp in gcomps:
+                    if comp.startswith('VNG_') and locus_tag is None:
+                        locus_tag = comp
+                    elif symbol is None and not comp.startswith('VNG'):
+                        symbol = comp
+                #print("%s => %s" % (locus_tag, symbol))
+                if symbol is not None:
+                    symbol_map[locus_tag] = symbol
+            except IndexError:
+                pass
+    return symbol_map
+
 def update_crossrefs(conn):
     lt2uniprot = {}
     lt2string = {}
+    symbol_map = {}
     with open('Halo_uniprot-taxonomy_64091.csv') as infile:
         headers = infile.readline().strip().split('\t')
         print(list(zip(headers, range(len(headers)))))
@@ -407,7 +438,47 @@ def update_crossrefs2(conn):
 
     conn.commit()
 
+def merge_symbol_maps(symbol_map1, symbol_map2):
+    """merge symbol mappings from cog and uniprot, always prefer Uniprot mappings
+    """
+    final_symbol_map = {}
+    keys1 = sorted(symbol_map1.keys())
+    keys2 = sorted(symbol_map2.keys())
+    all_keys = set(keys1 + keys2)
+    #print("keys1: %d elems, keys2: %d elems all_keys: %d elems" % (len(keys1), len(keys2), len(all_keys)))
+    for key in sorted(all_keys):
+        try:
+            symbol1 = symbol_map1[key]
+        except KeyError:
+            symbol1 = None
+        symbols2 = symbol_map2[key]
+        if len(symbols2) > 0:
+            symbol2 = symbols2[0]
+        else:
+            symbol2 = None
+        """
+        if symbol1 != symbol2:
+            print("MISMATCH: %s [%s] != [%s]" % (key, symbol1, symbol2))
+        else:
+            print("MATCH: %s [%s] != [%s]" % (key, symbol1, symbol2))
+        """
+        # Always favor the uniprot symbols
+        if symbol1 is not None:
+            final_symbol_map[key] = symbol1
+        elif symbol2 is not None:
+            final_symbol_map[key] = symbol2
+
+    return final_symbol_map
+
+
 if __name__ == '__main__':
+    """
+    symbol_map1 = read_symbolmap()
+    cog_map, gene2cog, symbol_map2 = read_cog_data()
+    final_symbol_map = merge_symbol_maps(symbol_map1, symbol_map2)
+    for key, value in final_symbol_map.items():
+        print('%s\t%s' % (key, value))"""
+
     gene_track_map = read_gene_tracks()
     conn = dbconn()
     import_genes(conn, gene_track_map)
