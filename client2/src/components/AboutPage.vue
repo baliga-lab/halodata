@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-row>
+    <v-row style="margin: auto; width: 80%">
       <v-col class="mb-4">
         <h2>Table of contents</h2>
         <ul>
@@ -198,11 +198,11 @@
 
         <h2 id="usage-examples">Usage Examples</h2>
         <h3 id="ue-selectgene">Selecting a gene to open in the genome browser</h3>
-        <v-img alt="select gene" src="@/assets/ue_selectgene.gif" />
+        <v-img style="width: 75%" alt="select gene" src="@/assets/ue_selectgene.gif" />
         <p>&nbsp;</p>
 
         <h3 id="ue-browsemobilome">Browsing the mobilome cluster using the interactive heat map</h3>
-        <v-img alt="browse mobilome cluster" src="@/assets/ue_browse_mobilome.gif" />
+        <v-img style="width: 75%" alt="browse mobilome cluster" src="@/assets/ue_browse_mobilome.gif" />
         <p>&nbsp;</p>
 
         <h3 id="ue-intheatmapsearch">Using the interactive heat map search tool</h3>
@@ -213,11 +213,11 @@
 VNG_7015,VNG_7016,VNG_7017,VNG_7018,VNG_7019,VNG_7020,VNG_7021,VNG_7022,VNG_7023,VNG_7024
 VNG_7025,VNG_7026,VNG_7027,VNG_7028
         </pre>
-        <v-img alt="use interactive heatmap search" src="@/assets/ue_intheatmapsearch.gif" />
+        <v-img style="width: 75%" alt="use interactive heatmap search" src="@/assets/ue_intheatmapsearch.gif" />
         <p>&nbsp;</p>
 
         <h3 id="ue-downloaddata">Downloading data for the gvp gene cluster demonstrated above</h3>
-        <v-img alt="download data" src="@/assets/ue_downloaddata.gif" />
+        <v-img style="width: 75%" alt="download data" src="@/assets/ue_downloaddata.gif" />
         <p>&nbsp;</p>
 
         <h2 id="download">Data download</h2>

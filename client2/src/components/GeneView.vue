@@ -14,10 +14,11 @@
     <span style="font-size: 16pt"><b>{{newInfo.gene}}</b> {{altGeneDesc}}</span>&nbsp;
     <span v-if="proteinStructureData" style="font-size: 16pt; vertical-align: bottom">{{newInfo.product}}</span>
   </v-row>
+  <!--
   <v-row  style="text-align: left">
     <h3  v-if="$isMobile()">MOBILE</h3>
     <h3  v-else>JUST WEB</h3>
-  </v-row>
+  </v-row> -->
   <v-spacer style="height: 48pt"></v-spacer>
   <v-row  style="text-align: left" v-if="proteinStructureData">
     <h3>Annotations</h3>
