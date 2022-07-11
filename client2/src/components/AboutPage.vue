@@ -16,9 +16,9 @@
           <li>
             <a href="#usage-examples">Usage Examples</a>
             <ul>
-              <li><a href="#ue-selectgene">Select a gene to open in the genome browser</a></li>
+              <li><a href="#ue-selectgene">Selecting a gene to open in the genome browser</a></li>
               <li><a href="#ue-browsemobilome">Browsing the mobilome cluster using the interactive heat map</a></li>
-              <li><a href="#ue-intheatmapsearch">Using the interactive heat map search tool</a></li>
+              <li><a href="#ue-intheatmapsearch">Using the interactive heatmap search tool</a></li>
               <li><a href="#ue-downloaddata">Downloading data for the gvp gene cluster demonstrated above</a></li>
             </ul>
           </li>
@@ -34,8 +34,6 @@
         <p>
           The <i>H. salinarum</i> NRC-1 Atlas is a web resource conceived to support the discovery of potential post-transcriptional regulation mechanisms by observing multi-omics data of a growth curve experiment and miscellaneous features obtained from public data. It debuted as a companion web portal for the manuscript entitled <i>"A genome-scale atlas reveals complex interplay of transcription and translation in an archaeon"</i> (Lorenzetti et al., 2022). Below, we describe each section of this web portal.
         </p>
-
-
         <h2 id="portaldesc">Portal description</h2>
         <h3 id="pd-home">Home</h3>
         <p>
@@ -52,6 +50,7 @@
             <b>IS Info:</b> This table brings a non-redundant set of insertion sequences (mobile genetic elements). The open reading frames (column #1) are localized within the named insertion sequences (column #2) from various families (column #3) and subgroups (column #4).
           </li>
         </ul>
+        <p>&nbsp;</p>
         <p>
           Clicking on the linked locus tags will take you to a page dedicated to the selected gene. It should take about 30 seconds to load the page. There, you will get general information about the gene and a genome browser centering on the region of interest and its neighbors. Notice that you cannot go far right or left because the features will disappear after a few kilobases. That is a consequence of downsizing the data sets to avoid memory-related crashes. If you would like to browse another gene, please, go back to the "Home" section and start your search again.
         </p>
@@ -74,12 +73,9 @@
               </li>
               <li>
                 <b>TPS (+):</b> Transcript processing sites (positive strand) collected from <a href="https://pubmed.ncbi.nlm.nih.gov/34209065/" target="_blank">Ibrahim et al. (2021)</a>;
-
-
               </li>
               <li>
                 <b>SmAP1 interaction (+):</b> Protein-RNA interaction inferred from a SmAP1-RNA co-immunoprecipitation assay followed by next-generation sequencing (positive strand);
-
               </li>
               <li>
                 <b>Antisense RNAs:</b> Antisense RNA annotation from <a href="https://pubmed.ncbi.nlm.nih.gov/30959844/" target="_blank">de Almeida et al. (2019)</a>;
@@ -129,7 +125,6 @@
             <b>Sequences:</b> DNA and protein sequences for the selected gene.
           </li>
         </ul>
-
         <p>&nbsp;</p>
         <h3 id="pd-atlas">Atlas</h3>
         <p>
@@ -158,7 +153,7 @@
             <b>TPS:</b> Whether there is at least one transcript processing site (TPS) on the same strand for a given gene according to <a href="https://pubmed.ncbi.nlm.nih.gov/34209065/" target="_blank">Ibrahim et al. (2021)</a>;
           </li>
           <li>
-            <b>2099:</b> Log2-transformed fold change of RNase_2099C knockout vs. the control strain. Data reanalysis of <a href="https://pubmed.ncbi.nlm.nih.gov/24612392/" target="_blank">Wurtmann et al. (2014)</a>;
+            <b>2099:</b> Log<sub>2</sub>-transformed fold change of RNase_2099C knockout vs. the control strain. Data reanalysis of <a href="https://pubmed.ncbi.nlm.nih.gov/24612392/" target="_blank">Wurtmann et al. (2014)</a>;
           </li>
           <li>
             <b>Half-life:</b> Experimentally determined half-life of a transcript according to <a href="https://pubmed.ncbi.nlm.nih.gov/17644597/" target="_blank">Hundt et al. (2007)</a>;
@@ -170,42 +165,42 @@
             <b>GC Content:</b> Difference (residue) between GC content for a given gene and the mean GC content considering all the genes.
           </li>
         </ul>
+        <p>&nbsp;</p>
         <p>
-          Moreover, the tool shows five heat maps side-by-side, grouped by COG categories and clustered by Protein levels:
+          Moreover, the tool shows five heatmaps side-by-side, grouped by COG categories and clustered by Protein levels:
         </p>
         <ul>
           <li>
-            <b>Protein:</b> Log10-transformed proteome quantitative measure (a pseudocount was imputed for missing values) for consecutive time points of a growth curve (TP1: early exponential growth phase; TP2: mid-exponential growth phase; TP3: late exponential growth phase; TP4: stationary phase);
+            <b>Protein:</b> Log<sub>10</sub>-transformed proteome quantitative measure (a pseudocount was imputed for missing values) for consecutive time points of a growth curve (TP1: early exponential growth phase; TP2: mid-exponential growth phase; TP3: late exponential growth phase; TP4: stationary phase);
           </li>
           <li>
-            <b>mRNA:</b> Log10-transformed transcriptome quantitative measure (TPM+1) for consecutive time points of a growth curve (TP1: early exponential growth phase; TP2: mid-exponential growth phase; TP3: late exponential growth phase; TP4: stationary phase);
+            <b>mRNA:</b> Log<sub>10</sub>-transformed transcriptome quantitative measure (TPM+1) for consecutive time points of a growth curve (TP1: early exponential growth phase; TP2: mid-exponential growth phase; TP3: late exponential growth phase; TP4: stationary phase);
           </li>
           <li>
-            <b>RPF:</b> Log10-transformed ribosome mRNA protected fragment quantitative measure (RPF; Ribo-Seq experiment; TPM+1) for consecutive time points of a growth curve (TP1: early exponential growth phase; TP2: mid-exponential growth phase; TP3: late exponential growth phase; TP4: stationary phase);
+            <b>RPF:</b> Log<sub>10</sub>-transformed ribosome mRNA protected fragment quantitative measure (RPF; Ribo-Seq experiment; TPM+1) for consecutive time points of a growth curve (TP1: early exponential growth phase; TP2: mid-exponential growth phase; TP3: late exponential growth phase; TP4: stationary phase);
           </li>
           <li>
-            <b>TE:</b> Log2-transformed translational efficiency for consecutive time points of a growth curve (TP1: early exponential growth phase; TP2: mid-exponential growth phase; TP3: late exponential growth phase; TP4: stationary phase). Given by Protein divided by mRNA in a time point-wise manner;
+            <b>TE:</b> Log<sub>2</sub>-transformed translational efficiency for consecutive time points of a growth curve (TP1: early exponential growth phase; TP2: mid-exponential growth phase; TP3: late exponential growth phase; TP4: stationary phase). Given by Protein divided by mRNA in a time point-wise manner;
           </li>
           <li>
-            <b>RO:</b> Log2-transformed ribosome occupancy for consecutive time points of a growth curve (TP1: early exponential growth phase; TP2: mid-exponential growth phase; TP3: late exponential growth phase; TP4: stationary phase). Given by RPF divided by mRNA in a time point-wise manner.
+            <b>RO:</b> Log<sub>2</sub>-transformed ribosome occupancy for consecutive time points of a growth curve (TP1: early exponential growth phase; TP2: mid-exponential growth phase; TP3: late exponential growth phase; TP4: stationary phase). Given by RPF divided by mRNA in a time point-wise manner.
           </li>
         </ul>
         <p>&nbsp;</p>
         <h3 id="pd-atlas-static">Atlas (Static)</h3>
         <p>
-          This is a static version of the same heat map displayed in the <router-link to="/heatmap">"Atlas"</router-link> section. It should take about one minute to load the static heat map using the Google Chrome Browser. We realized that computers with old hardware and/or slow internet connections might be unable to load the interactive heat map successfully, so we built this static version. Please, see the download section below to download it as a PDF file.
+          This is a static version of the same heatmap displayed in the <router-link to="/heatmap">"Atlas"</router-link> section. It should take about one minute to load the static heatmap using the Google Chrome Browser. We realized that computers with old hardware and/or slow internet connections might be unable to load the interactive heatmap successfully, so we built this static version. Please, see the download section below to download it as a PDF file.
         </p>
-
         <h2 id="usage-examples">Usage Examples</h2>
         <h3 id="ue-selectgene">Selecting a gene to open in the genome browser</h3>
         <v-img style="width: 75%" alt="select gene" src="@/assets/ue_selectgene.gif" />
         <p>&nbsp;</p>
 
-        <h3 id="ue-browsemobilome">Browsing the mobilome cluster using the interactive heat map</h3>
+        <h3 id="ue-browsemobilome">Browsing the mobilome cluster using the interactive heatmap</h3>
         <v-img style="width: 75%" alt="browse mobilome cluster" src="@/assets/ue_browse_mobilome.gif" />
         <p>&nbsp;</p>
 
-        <h3 id="ue-intheatmapsearch">Using the interactive heat map search tool</h3>
+        <h3 id="ue-intheatmapsearch">Using the interactive heatmap search tool</h3>
         <p>
           For that, we are going to use a comma-separated set of locus tags for genes comprising the gvp cluster. Only representative locus tags are allowed (see column #1 in the table at the "Home" section for all the possible entries).
         </p>
@@ -226,10 +221,10 @@ VNG_7025,VNG_7026,VNG_7027,VNG_7028
         </p>
         <ul>
           <li>
-            <b>Atlas:</b> The entire table used to generate the interactive heat map is available <a href="https://github.com/alanlorenzetti/halo_atlas/blob/main/shiny_hsal_atlas/data/File_S1.xlsx" target="_blank">here</a> and as a supplement file in our manuscript (protein levels, RNA-Seq levels, Ribo-Seq levels, translational efficiency, and ribosome occupancy are not log-transformed in this version; the column description is available inside the workbook);
+            <b>Atlas:</b> The entire table used to generate the interactive heatmap is available <a href="https://github.com/alanlorenzetti/halo_atlas/blob/main/shiny_hsal_atlas/data/File_S1.xlsx" target="_blank">here</a> and as a supplement file in our manuscript (protein levels, RNA-Seq levels, Ribo-Seq levels, translational efficiency, and ribosome occupancy are not log-transformed in this version; the column description is available inside the workbook);
           </li>
           <li>
-            <b>Atlas (Static):</b> A PDF file for the static heat map is available <a href="https://github.com/alanlorenzetti/halo_atlas/blob/main/shiny_hsal_atlas/data/File_S8.pdf" target="_blank">here</a>;
+            <b>Atlas (Static):</b> A PDF file for the static heatmap is available <a href="https://github.com/alanlorenzetti/halo_atlas/blob/main/shiny_hsal_atlas/data/File_S8.pdf" target="_blank">here</a>;
           </li>
           <li>
             <b>Genome browser:</b> A bundle containing all the tracks is available <a href="https://github.com/alanlorenzetti/halo_atlas/blob/main/shiny_hsal_atlas/data/igv_bundle.tar.gz" target="_blank">here</a>. We identify each file below, and you should be able to get more details each track in the genome browser description above:
@@ -277,31 +272,32 @@ VNG_7025,VNG_7026,VNG_7027,VNG_7028
         </p>
 
         <h2 id="funding">Funding</h2>
-
         <p>
           The development of the Halo Data Atlas is supported by the following grants
         </p>
         <ul>
-          <li>NSF - MCB - 2105570</li>
-          <li>NSF</li>
-          <li>The S&atilde;o Paulo Research Foundation (FAPESP) fellowship grants #2017/03052-2 and #2019/13440-5.</li>
-          <li>FAPESP fellowships #2011/07487-7 and #2013/21522-5</li>
-          <li>FAPESP grants #2009/09532-0 and #2015/21038-1</li>
-          <li>The Coordenação de Aperfeiçoamento de Pessoal de Nível Superior—Brasil (CAPES) - Finance Code 001</li>
-          <li>The Fundação de Apoio ao Ensino, Pesquisa e Assistência do Hospital das Clínicas da Faculdade de Medicina de Ribeirão Preto da Universidade de São Paulo (FAEPA)</li>
+          <li>National Science Foundation: MCB-1616955;</li>
+          <li>National Science Foundation: MCB-2105570;</li>
+          <li>The São Paulo Research Foundation (FAPESP) fellowships #2017/03052-2 and #2019/13440-5;</li>
+          <li>FAPESP fellowships #2011/07487-7 and #2013/21522-5;</li>
+          <li>FAPESP grants #2009/09532-0 and #2015/21038-1;</li>
+          <li>The Coordenação de Aperfeiçoamento de Pessoal de Nível Superior—Brasil (CAPES) - Finance Code 001;</li>
+          <li>The Fundação de Apoio ao Ensino, Pesquisa e Assistência do Hospital das Clínicas da Faculdade de Medicina de Ribeirão Preto da Universidade de São Paulo (FAEPA).</li>
         </ul>
+        
+        <p>&nbsp;</p>
         <h2 id="team">Team</h2>
         <ul>
-          <li>Alan Péricles Rodrigues Lorenzetti <sup><a href="#fn1">1</a>,<a href="#fn2">2</a>,<a href="#fn3">3</a></sup></li>
-          <li>Lívia Soares Zaramela <sup><a href="#fn1">1</a></sup></li>
-          <li>João Paulo Pereira de Almeida <sup><a href="#fn1">1</a>,<a href="#fn4">4</a></sup></li>
-          <li>Serdar Turkarslan <sup><a href="#fn2">2</a></sup></li>
-          <li>Wei-Ju Wu <sup><a href="#fn2">2</a></sup></li>
-          <li>Adrián López García de Lomana <sup><a href="#fn2">2</a>,<a href="#fn5">5</a></sup></li>
-          <li>José Vicente Gomes-Filho <sup><a href="#fn1">1</a>,<a href="#fn6">6</a></sup></li>
+          <li>Alan P. R. Lorenzetti <sup><a href="#fn1">1</a>,<a href="#fn2">2</a>,<a href="#fn3">3</a></sup></li>
           <li>Ulrike Kusebauch <sup><a href="#fn2">2</a></sup></li>
-          <li>Ricardo Zorzetto Nicoliello Vêncio <sup><a href="#fn7">7</a></sup></li>
-          <li>Robert Moritz <sup><a href="#fn2">2</a></sup></li>
+          <li>Lívia S. Zaramela <sup><a href="#fn1">1</a></sup></li>
+          <li>Wei-Ju Wu <sup><a href="#fn2">2</a></sup></li>
+          <li>João P. P. de Almeida <sup><a href="#fn1">1</a>,<a href="#fn4">4</a></sup></li>
+          <li>Serdar Turkarslan <sup><a href="#fn2">2</a></sup></li>
+          <li>Adrián L. G. de Lomana <sup><a href="#fn2">2</a>,<a href="#fn5">5</a></sup></li>
+          <li>José V. Gomes-Filho <sup><a href="#fn1">1</a>,<a href="#fn6">6</a></sup></li>
+          <li>Ricardo Z. N. Vêncio <sup><a href="#fn7">7</a></sup></li>
+          <li>Robert L. Moritz <sup><a href="#fn2">2</a></sup></li>
           <li>Tie Koide <sup><a href="#fn1">1</a></sup></li>
           <li>Nitin S. Baliga <sup><a href="#fn1">2</a>,<a href="#fn8">8</a>,<a href="#fn9">9</a>,<a href="#fn10">10</a></sup></li>
         </ul>
@@ -324,7 +320,6 @@ VNG_7025,VNG_7026,VNG_7027,VNG_7028
   .section-sep {
   margin-top: 10pt;
   margin-bottom: 5pt;
-
   }
 </style>
 <script>
