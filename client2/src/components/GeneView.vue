@@ -376,12 +376,14 @@ export default {
         reloadIGVBrowser: function() {
             if (this.newInfo.chrom != '') {
                 this.$nextTick(() => {
-                    this.loadIGVBrowser(this.newInfo.igv_loc, this.newInfo.track_range);
+                    this.loadIGVBrowser(this.newInfo.igv_loc,
+                                        this.newInfo.track_range,
+                                        this.splitTracksDir);
                 });
             }
         },
-        loadIGVBrowser: function(igvLoc, trackRange) {
-            console.log('track range: ' + trackRange);
+        loadIGVBrowser: function(igvLoc, trackRange, splitTracksDir) {
+            console.log('track range: ' + trackRange + ' splittracks: ' + splitTracksDir);
             igv.removeAllBrowsers();
             var igvDiv = this.$refs.igv; //document.getElementById("igv");
             var self = this;
@@ -402,7 +404,7 @@ export default {
                         frameTranslate: true
                     },
                     {
-                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP1-fwd_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/ribosomal_RNA_TP1-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -411,7 +413,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP2-fwd_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/ribosomal_RNA_TP2-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         logScale: this.isLogScale,
                         format: "bedgraph",
@@ -420,7 +422,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP3-fwd_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/ribosomal_RNA_TP3-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -429,7 +431,7 @@ export default {
                         color: "darkgrey"
                         },
                     {
-                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP4-fwd_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/ribosomal_RNA_TP4-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -438,7 +440,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/total-RNA-TP1-rev_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/total-RNA-TP1-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -447,7 +449,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/total-RNA-TP2-rev_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/total-RNA-TP2-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -456,7 +458,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/total-RNA-TP3-rev_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/total-RNA-TP3-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -465,7 +467,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/total-RNA-TP4-rev_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/total-RNA-TP4-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -536,7 +538,7 @@ export default {
                         displayMode: "SQUISHED"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP1-rev_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/ribosomal_RNA_TP1-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -545,7 +547,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP2-rev_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/ribosomal_RNA_TP2-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -554,7 +556,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP3-rev_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/ribosomal_RNA_TP3-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -563,7 +565,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/ribosomal_RNA_TP4-rev_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/ribosomal_RNA_TP4-rev_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -572,7 +574,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/total-RNA-TP1-fwd_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/total-RNA-TP1-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -581,7 +583,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/total-RNA-TP2-fwd_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/total-RNA-TP2-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -590,7 +592,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/total-RNA-TP3-fwd_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/total-RNA-TP3-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -599,7 +601,7 @@ export default {
                         color: "darkgrey"
                     },
                     {
-                        url: STATIC_URL + "split_tracks/total-RNA-TP4-fwd_" + trackRange + ".bedgraph.gz",
+                        url: STATIC_URL + splitTracksDir + "/total-RNA-TP4-fwd_" + trackRange + ".bedgraph.gz",
                         type: "wig",
                         format: "bedgraph",
                         logScale: this.isLogScale,
@@ -621,6 +623,7 @@ export default {
         var newInfoApi = BASE_URL + '/gene_info/' + gene;
         var self = this;
         this.overlay = true;
+        this.splitTracksDir = this.$isMobile() ? "split_tracks_mobile" : "split_tracks";
         fetch(newInfoApi)
             .then((response) => { return response.json();
                                 }).then((result) => {
@@ -667,7 +670,9 @@ export default {
                                                         // WW: loading the browser too early results in the div not
                                                         // existing sometimes, so we wrap it in a nextTick
                                                         this.$nextTick(() => {
-                                                            this.loadIGVBrowser(this.proteinStructureData.igv_loc, this.proteinStructureData.track_range);
+                                                            this.loadIGVBrowser(this.proteinStructureData.igv_loc,
+                                                                                this.proteinStructureData.track_range,
+                                                                                this.splitTracksDir);
                                                         });
                                                     }
                                                 });
