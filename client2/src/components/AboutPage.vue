@@ -187,10 +187,7 @@
           </li>
         </ul>
         <p>&nbsp;</p>
-        <h3 id="pd-atlas-static">Atlas (Static)</h3>
-        <p>
-          This is a static version of the same heatmap displayed in the <router-link to="/heatmap">"Atlas"</router-link> section. It should take about one minute to load the static heatmap using the Google Chrome Browser. We realized that computers with old hardware and/or slow internet connections might be unable to load the interactive heatmap successfully, so we built this static version. Please, see the download section below to download it as a PDF file.
-        </p>
+     
         <h2 id="usage-examples">Usage Examples</h2>
         <h3 id="ue-selectgene">Selecting a gene to open in the genome browser</h3>
         <v-img style="width: 75%" alt="select gene" src="@/assets/ue_selectgene.gif" />
@@ -278,10 +275,13 @@ VNG_7025,VNG_7026,VNG_7027,VNG_7028
         <ul>
           <li>National Science Foundation: MCB-1616955;</li>
           <li>National Science Foundation: MCB-2105570;</li>
+          <li>National Science Foundation: DBI-1920268;</li>
+          <li>NIH—National Institute of General Medical Sciences: R01GM087221;</li>
+          <li>NIH—The Office of the Director: S10OD026936;</li>
           <li>The São Paulo Research Foundation (FAPESP) fellowships #2017/03052-2 and #2019/13440-5;</li>
           <li>FAPESP fellowships #2011/07487-7 and #2013/21522-5;</li>
           <li>FAPESP grants #2009/09532-0 and #2015/21038-1;</li>
-          <li>The Coordenação de Aperfeiçoamento de Pessoal de Nível Superior—Brasil (CAPES) - Finance Code 001;</li>
+          <li>The Coordenação de Aperfeiçoamento de Pessoal de Nível Superior—Brasil (CAPES)—Finance Code 001;</li>
           <li>The Fundação de Apoio ao Ensino, Pesquisa e Assistência do Hospital das Clínicas da Faculdade de Medicina de Ribeirão Preto da Universidade de São Paulo (FAEPA).</li>
         </ul>
         
