@@ -10,7 +10,6 @@
             <ul>
               <li><a href="#pd-home">Home</a></li>
               <li><a href="#pd-atlas">Atlas</a></li>
-              <li><a href="#pd-atlas-static">Atlas (Static)</a></li>
             </ul>
           </li>
           <li>
