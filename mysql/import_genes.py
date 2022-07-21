@@ -6,6 +6,28 @@ import traceback as tb
 
 import db_add_missing_locations as fix_loc
 
+HALO_UNIPROT_PATH = "uniprot-compressed_true_download_true_fields_accession_2Cgene_primar-2022.07.21-16.43.57.65.tsv"
+#HALO_UNIPROT_PATH = 'Halo_uniprot-taxonomy_64091.csv'
+
+UP_ID_IDX = 0
+UP_GENE_SYMBOL_IDX = 1
+UP_LOCUS_TAG_IDX = 2
+UP_PATHWAY_IDX = 3
+UP_GO_BIO_IDX = 4
+UP_GO_CELL_IDX = 5
+UP_GO_MOL_IDX = 6
+UP_STRING_IDX = 7
+UP_EGGNOG_IDX = 8
+UP_ORTHODB_IDX = 9
+UP_UNIPATHWAY_IDX = 10
+UP_CDD_IDX = 11
+UP_PROSITE_IDX = 12
+UP_SMART_IDX = 13
+UP_PFAM_IDX = 14
+UP_INTERPRO_IDX = 15
+UP_GENE_NAMES_IDX = 16
+
+
 def dbconn():
     return mysql.connector.connect(host="127.0.0.1", port=3306, user='root', database='halodata')
 
@@ -150,6 +172,9 @@ def import_genes(conn, gene_info_map):
         for gene, seq in seqs.items():
             # isolate the vng name
             product = synonyms[gene]['product']
+            # this is a hack to append RNAse to a known gene
+            if gene == 'VNG_2099C':
+                product += ', RNAse'
             locus_tags = synonyms[gene]['locus_tags']
             try:
                 gene_symbol = final_symbol_map[gene]
@@ -265,27 +290,25 @@ def import_extra_genes(conn, gene_track_map):
 
 
 def read_symbolmap():
-    symbol_map = {}
-    with open('Halo_uniprot-taxonomy_64091.csv') as infile:
+    symbol_map = defaultdict(list)
+    with open(HALO_UNIPROT_PATH) as infile:
         # The gene names fiield has EVERYTHING !!!!
         header = infile.readline()
         for line in infile:
             comps = line.strip().split('\t')
             try:
-                gene_names = comps[2]
-                #print(gene_names)
+                gene_names = comps[UP_GENE_NAMES_IDX]
                 gcomps = gene_names.strip().split()
-                locus_tag = None
-                symbol = None
-                #print(gcomps)
+                locus_tags = []
+                symbols = []
                 for comp in gcomps:
-                    if comp.startswith('VNG_') and locus_tag is None:
-                        locus_tag = comp
-                    elif symbol is None and not comp.startswith('VNG'):
-                        symbol = comp
-                #print("%s => %s" % (locus_tag, symbol))
-                if symbol is not None:
-                    symbol_map[locus_tag] = symbol
+                    if comp.startswith('VNG_'):
+                        locus_tags.append(comp)
+                    elif not comp.startswith('VNG'):
+                        symbols.append(comp)
+                for locus_tag in locus_tags:
+                    for symbol in symbols:
+                        symbol_map[locus_tag].append(symbol)
             except IndexError:
                 pass
     return symbol_map
@@ -294,7 +317,7 @@ def update_crossrefs(conn):
     lt2uniprot = {}
     lt2string = {}
     symbol_map = {}
-    with open('Halo_uniprot-taxonomy_64091.csv') as infile:
+    with open(HALO_UNIPROT_PATH) as infile:
         headers = infile.readline().strip().split('\t')
         print(list(zip(headers, range(len(headers)))))
 
@@ -303,10 +326,10 @@ def update_crossrefs(conn):
         for line in infile:
             linenum += 1
             comps = line.strip().split('\t')
-            uniprot_id = comps[0]
+            uniprot_id = comps[UP_ID_IDX]
 
             try:
-                string_str = comps[8]
+                string_str = comps[UP_STRING_IDX]
                 string_comps = [sc for sc in string_str.split(';') if len(sc) > 0]
                 #print(string_comps)
             except IndexError:
@@ -316,7 +339,7 @@ def update_crossrefs(conn):
                 raise Exception('more than 1 STRING !!')
 
             try:
-                locus_tag_str = comps[17]
+                locus_tag_str = comps[UP_LOCUS_TAG_IDX]
                 if len(locus_tag_str.strip()) > 0:
                     locus_tags = [lt.strip() for lt in locus_tag_str.split(';')]
                     for lt in locus_tags:
@@ -381,58 +404,58 @@ def update_crossrefs2(conn):
     pfam2id = {}
     interpro2id = {}
 
-    with open('Halo_uniprot-taxonomy_64091.csv') as infile:
+    with open(HALO_UNIPROT_PATH) as infile:
         infile.readline()  # skip header
         linenum = 0
         # every locus tag has at most one uniprot id
         for line in infile:
             linenum += 1
             comps = line.strip().split('\t')
-            uniprot_id = comps[0]
+            uniprot_id = comps[UP_ID_IDX]
 
             # insert pathways
             try:
-                process_uniprot_field(conn, uniprot_id, comps[3], 'pathways', 'gene_pathways', pathway2id)
+                process_uniprot_field(conn, uniprot_id, comps[UP_PATHWAY_IDX], 'pathways', 'gene_pathways', pathway2id)
             except IndexError:
                 continue  # skip this entry
             try:
-                process_uniprot_field(conn, uniprot_id, comps[4], 'go_bio', 'gene_go_bio', gobio2id)
+                process_uniprot_field(conn, uniprot_id, comps[UP_GO_BIO_IDX], 'go_bio', 'gene_go_bio', gobio2id)
             except IndexError:
                 continue  # skip this entry
             try:
-                process_uniprot_field(conn, uniprot_id, comps[5], 'go_cell', 'gene_go_cell', gocell2id)
+                process_uniprot_field(conn, uniprot_id, comps[UP_GO_CELL_IDX], 'go_cell', 'gene_go_cell', gocell2id)
             except IndexError:
                 continue  # skip this entry
             try:
-                process_uniprot_field(conn, uniprot_id, comps[6], 'go_mol', 'gene_go_mol', gomol2id)
+                process_uniprot_field(conn, uniprot_id, comps[UP_GO_MOL_IDX], 'go_mol', 'gene_go_mol', gomol2id)
             except IndexError:
                 continue  # skip this entry
             try:
-                process_uniprot_field_single(conn, uniprot_id, comps[10], 'orthodb_id')
+                process_uniprot_field_single(conn, uniprot_id, comps[UP_ORTHODB_IDX], 'orthodb_id')
             except IndexError:
                 continue  # skip this entry
             try:
-                process_uniprot_field(conn, uniprot_id, comps[11], 'uni_pathways', 'gene_uni_pathways', unipathway2id)
+                process_uniprot_field(conn, uniprot_id, comps[UP_UNIPATHWAY_IDX], 'uni_pathways', 'gene_uni_pathways', unipathway2id)
             except IndexError:
                 continue  # skip this entry
             try:
-                process_uniprot_field(conn, uniprot_id, comps[12], 'cdd_refs', 'gene_cdd_refs', cdd2id)
+                process_uniprot_field(conn, uniprot_id, comps[UP_CDD_IDX], 'cdd_refs', 'gene_cdd_refs', cdd2id)
             except IndexError:
                 continue  # skip this entry
             try:
-                process_uniprot_field(conn, uniprot_id, comps[13], 'prosite_refs', 'gene_prosite_refs', prosite2id)
+                process_uniprot_field(conn, uniprot_id, comps[UP_PROSITE_IDX], 'prosite_refs', 'gene_prosite_refs', prosite2id)
             except IndexError:
                 continue  # skip this entry
             try:
-                process_uniprot_field(conn, uniprot_id, comps[14], 'smart_refs', 'gene_smart_refs', smart2id)
+                process_uniprot_field(conn, uniprot_id, comps[UP_SMART_IDX], 'smart_refs', 'gene_smart_refs', smart2id)
             except IndexError:
                 continue  # skip this entry
             try:
-                process_uniprot_field(conn, uniprot_id, comps[15], 'pfam_refs', 'gene_pfam_refs', pfam2id)
+                process_uniprot_field(conn, uniprot_id, comps[UP_PFAM_IDX], 'pfam_refs', 'gene_pfam_refs', pfam2id)
             except IndexError:
                 continue  # skip this entry
             try:
-                process_uniprot_field(conn, uniprot_id, comps[16], 'interpro_refs', 'gene_interpro_refs', interpro2id)
+                process_uniprot_field(conn, uniprot_id, comps[UP_INTERPRO_IDX], 'interpro_refs', 'gene_interpro_refs', interpro2id)
             except IndexError:
                 continue  # skip this entry
 
@@ -448,8 +471,10 @@ def merge_symbol_maps(symbol_map1, symbol_map2):
     #print("keys1: %d elems, keys2: %d elems all_keys: %d elems" % (len(keys1), len(keys2), len(all_keys)))
     for key in sorted(all_keys):
         try:
-            symbol1 = symbol_map1[key]
+            symbol1 = symbol_map1[key][0]
         except KeyError:
+            symbol1 = None
+        except IndexError:
             symbol1 = None
         symbols2 = symbol_map2[key]
         if len(symbols2) > 0:
