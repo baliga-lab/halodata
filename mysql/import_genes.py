@@ -175,6 +175,8 @@ def import_genes(conn, gene_info_map):
             # this is a hack to append RNAse to a known gene
             if gene == 'VNG_2099C':
                 product += ', RNAse'
+            elif gene == 'VNG_1496G':
+                product += ', SmAP1'
             locus_tags = synonyms[gene]['locus_tags']
             try:
                 gene_symbol = final_symbol_map[gene]

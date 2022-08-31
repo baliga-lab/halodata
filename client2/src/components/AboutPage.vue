@@ -217,13 +217,13 @@ VNG_7025,VNG_7026,VNG_7027,VNG_7028
         </p>
         <ul>
           <li>
-            <b>Atlas:</b> The entire table used to generate the interactive heatmap is available <a href="https://github.com/alanlorenzetti/halo_atlas/blob/main/shiny_hsal_atlas/data/File_S1.xlsx" target="_blank">here</a> and as a supplement file in our manuscript (protein levels, RNA-Seq levels, Ribo-Seq levels, translational efficiency, and ribosome occupancy are not log-transformed in this version; the column description is available inside the workbook);
+            <b>Atlas:</b> The entire table used to generate the interactive heatmap is available <a :href="heatmapTableURL" target="_blank">here</a> and as a supplement file in our manuscript (protein levels, RNA-Seq levels, Ribo-Seq levels, translational efficiency, and ribosome occupancy are not log-transformed in this version; the column description is available inside the workbook);
           </li>
           <li>
-            <b>Atlas (Static):</b> A PDF file for the static heatmap is available <a href="https://github.com/alanlorenzetti/halo_atlas/blob/main/shiny_hsal_atlas/data/File_S8.pdf" target="_blank">here</a>;
+            <b>Atlas (Static):</b> A PDF file for the static heatmap is available <a :href="heatmapPDFURL" target="_blank">here</a>;
           </li>
           <li>
-            <b>Genome browser:</b> A bundle containing all the tracks is available <a href="https://github.com/alanlorenzetti/halo_atlas/blob/main/shiny_hsal_atlas/data/igv_bundle.tar.gz" target="_blank">here</a>. We identify each file below, and you should be able to get more details each track in the genome browser description above:
+            <b>Genome browser:</b> A bundle containing all the tracks is available <a :href="dataArchiveURL" target="_blank">here</a>. We identify each file below, and you should be able to get more details each track in the genome browser description above:
             <ul>
               <li><b>Hsalinarum.fa:</b> Halobacterium salinarum NRC-1 genome sequence (FASTA format);</li>
               <li>
@@ -321,9 +321,14 @@ VNG_7025,VNG_7026,VNG_7027,VNG_7028
   }
 </style>
 <script>
+var STATIC_URL = process.env.VUE_APP_STATIC_URL;
+
 export default {
     name: 'AboutPage',
     data: () => ({
+        heatmapTableURL: STATIC_URL + 'File_S1.xlsx',
+        heatmapPDFURL: STATIC_URL + 'File_S8.pdf',
+        dataArchiveURL: STATIC_URL + 'igv_bundle.tar.gz'
     })
   }
 </script>
