@@ -223,7 +223,7 @@ VNG_7025,VNG_7026,VNG_7027,VNG_7028
             <b>Atlas (Static):</b> A PDF file for the static heatmap is available <a :href="heatmapPDFURL" target="_blank">here</a>;
           </li>
           <li>
-            <b>Genome browser:</b> A bundle containing all the tracks is available <a :href="dataArchiveURL" target="_blank">here</a>. We identify each file below, and you should be able to get more details each track in the genome browser description above:
+            <b>Genome browser:</b> A bundle containing all the tracks is available <a :href="dataArchiveURL" target="_blank">here</a>. We identify each file below, and you should be able to get more details about each track in the genome browser description section above:
             <ul>
               <li><b>Hsalinarum.fa:</b> Halobacterium salinarum NRC-1 genome sequence (FASTA format);</li>
               <li>
