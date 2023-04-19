@@ -259,7 +259,7 @@ VNG_7025,VNG_7026,VNG_7027,VNG_7028
           If you make use of this web portal or the data we made public, please, cite:
         </p>
         <p>
-          Lorenzetti, A.P.R., Kusebauch, U., Zaramela, L.S., Wu, W.J., de Almeida, J.P., Turkarslan, S., LG de Lomana, A., Gomes-Filho, J.V., Vêncio, R.Z., Moritz, R.L. and Koide, T., 2023. A genome-scale atlas reveals complex interplay of transcription and translation in an archaeon. Msystems, pp.e00816-22. <a href="https://doi.org/10.1128/msystems.00816-22">https://doi.org/10.1128/msystems.00816-22</a>
+          Lorenzetti, A.P.R., Kusebauch, U., Zaramela, L.S., Wu, W-J., de Almeida, J.P.P., Turkarslan, S., de Lomana, A.L.G., Gomes-Filho, J.V., Vêncio, R.Z.N., Moritz, R.L., Koide, T., and Baliga, N.S. (2023). A Genome-Scale Atlas Reveals Complex Interplay of Transcription and Translation in an Archaeon. <i>mSystems</i>, e00816-22. <a href="https://doi.org/10.1128/msystems.00816-22">https://doi.org/10.1128/msystems.00816-22</a>
         </p>
 
         <h2 id="support">Bugs and feature requests</h2>
