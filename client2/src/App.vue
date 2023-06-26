@@ -36,17 +36,28 @@
       <router-view></router-view>
     </v-main>
     <v-footer>Developed by Baliga Lab at the Institute for Systems Biology</v-footer>
+    <div ref="scriptHolder"></div>
   </v-app>
 </template>
 
 <script>
-
 export default {
     name: 'App',
     created() {
-        document.title = "H. salinarum NRC-1 Atlas"
+        document.title = "H. salinarum NRC-1 Atlas";
+    },
+    mounted() {
+        let gaScript1 = document.createElement('script');
+        gaScript1.setAttribute("src", "https://www.googletagmanager.com/gtag/js?id=G-23G880QVFQ");
+        let gaScript2 = document.createElement('script');
+        gaScript2.textContent = "window.dataLayer=window.dataLayer || [];" +
+            "function gtag(){dataLayer.push(arguments);}" +
+            "gtag('js', new Date());" +
+            "gtag('config', 'G-23G880QVFQ');";
+        this.$refs.scriptHolder.append(gaScript1);
+        this.$refs.scriptHolder.append(gaScript2);
     },
     data: () => ({
-    })
+    }),
 };
 </script>

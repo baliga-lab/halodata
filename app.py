@@ -544,4 +544,4 @@ def search(search_term):
 if __name__ == '__main__':
     app.debug = True
     app.secret_key = 'rtrit#!@#pw34344ct'
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=3000, debug=True)
