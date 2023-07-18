@@ -10,7 +10,7 @@
   "dependencies": {
     "@baliga-lab/inchlib.js": "^1.0.0",
     "core-js": "^3.8.3",
-    "igv": "^2.10.4",
+    "igv": "2.10.4",
     "jquery": "^3.6.0",
     "kinetic": "^5.2.0",
     "vue": "^2.6.14",
